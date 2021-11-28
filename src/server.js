@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const { fork } = require('child_process');
+const open = require('open');
 const { createHaxballServer } = require('./haxserver.js')
 
 const serverName = process.argv[2];
@@ -17,10 +18,42 @@ if(!recaptchaToken) {
   throw "Please provide a repcaptcha token as a third argument";
 }
 
-const numberOfPlayers  = 2;
-const players = [];
+const numberOfPlayers = 2;
+let players = [];
+
+var gameCallbacks = {}
+gameCallbacks.onGameTick = async function(data) {
+  //if(data.tickNumber % 10 == 0) {
+    //console.log("TICK : "+data.tickNumber + " ball x="+data.ball.x+" y="+data.ball.y);
+    /*data.players.forEach((player, i) => {
+      if(player.position == null)
+        return;
+      console.log("    "+player.name + " x="+player.position.x+" y="+player.position.y);
+    });*/
+    players.forEach(child => child.send({ callback: "onGameTick", data: data }));
+  //}
+}
+
+gameCallbacks.onPlayerChat = async function(data) {
+  console.log(data);
+  players.forEach(child => child.send({ callback: "onPlayerChat", data: data }));
+}
+
+gameCallbacks.onPlayerJoin = async function(data) {
+  console.log(data + " has joined the server");
+}
+
+async function onGameMessage(callback, data) {
+  if(callback in gameCallbacks && typeof gameCallbacks[callback] === "function") {
+    gameCallbacks[callback](data);
+  }
+  else {
+    console.log("The following callback function doesn't exist : "+callback);
+  }
+}
+
 async function run () {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch( { dumpio: true });
     const page = await browser.newPage();
 
     //await page.setViewport({ width: 1900, height: 1024 })
@@ -30,38 +63,32 @@ async function run () {
 
     var frames = await page.frames();
     var myframe = frames.find(f => f.url().indexOf("__cache_static__/g/headless.html") > -1);
-    //console.log("frame trouve");
 
-    var playerJoined = function(playerName) {
-      console.log(playerName);
-    }
+    await page.exposeFunction("messageToServer", onGameMessage);
 
-    await page.exposeFunction("letMeKnowPlayerHasJoined", (playerId) => {
-        console.log("player has joined : "+playerId);
-    });
+    page.evaluate(createHaxballServer, serverName, password, recaptchaToken);
 
-    await page.exposeFunction("ballKicked", (number) => {
-        console.log("ball has been kicked "+number +" times");
-    });
-
-    page.evaluate(createHaxballServer, serverName, password, recaptchaToken, playerJoined);
-
+    const selectorRoomLink = "#roomlink p a";
     try {
-      await page.waitForSelector("#roomLink p a", {timeout: 3000});
+      await myframe.waitForSelector(selectorRoomLink, {timeout: 3000});
     } catch (e) {
-        console.log("Invalid token !")
+        console.log("Invalid token ! ");
         browser.close();
         return;
     }
 
-    const roomLink = await myframe.evaluate(() => document.querySelector("#roomLink p a").innerText);
+    const roomLink = await myframe.evaluate((selectorRoomLink) => document.querySelector(selectorRoomLink).innerText, selectorRoomLink);
     console.log(roomLink);
+    open(roomLink);
 
-    for(let p=0; p < numberOfPlayers; p++) {
+    for(let p = 0; p < numberOfPlayers; p++) {
       let playerName = "Bot_"+(p+1);
-      const process = fork("./index.js", [roomLink, playerName]);// "+roomLink+" "+playerName);
-      players.push(process);
+      const child = fork("./src/client.js", [roomLink, playerName]);
+      players.push(child);
+      console.log(playerName + " has been created and forked")
+      await page.waitForTimeout(3000);
     }
+
 
 
 
