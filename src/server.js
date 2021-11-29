@@ -1,6 +1,5 @@
 const puppeteer = require('puppeteer');
 const { fork } = require('child_process');
-const open = require('open');
 const { createHaxballServer } = require('./haxserver.js')
 
 let players = [];
@@ -36,8 +35,12 @@ async function onGameMessage(callback, data) {
   }
 }
 
-async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots, verbose=false) {
-    const browser = await puppeteer.launch( { dumpio: true });
+async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots, vps, verbose) {
+    var browserParams = { dumpio: true };
+    if(vps) {
+      browserParams.args = ["--disable-features=WebRtcHideLocalIpsWithMdns"];
+    }
+    const browser = await puppeteer.launch(browserParams);
     const page = await browser.newPage();
 
     await page.setViewport({ width: 2, height: 2 })
@@ -63,7 +66,12 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
 
     const roomLink = await myframe.evaluate((selectorRoomLink) => document.querySelector(selectorRoomLink).innerText, selectorRoomLink);
     console.log(roomLink);
-    open(roomLink);
+
+    if(!vps) {
+      const open = require('open');
+      open(roomLink);
+    }
+
 
     for(let p = 0; p < numberOfBots; p++) {
       let playerName = "Bot_"+(p+1);

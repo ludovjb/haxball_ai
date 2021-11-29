@@ -10,8 +10,9 @@ parser.add_argument('-n', '--name', { help: 'Room name', default: 'HaxBall AI Ro
 parser.add_argument('-p', '--password', { help: 'Room password', default: 'caen' });
 parser.add_argument('-b', '--bots', { help: 'Number of bots', type: 'int', default: 2});
 parser.add_argument('-v', '--verbose', { help: 'Verbose flag', default: false });
+parser.add_argument('--vps', { help: 'If the server will be running on a VPS', action: 'store_true' });
 
 args = parser.parse_args();
 console.dir(args);
 
-launchServer(args.roomname, args.password, args.token, args.bots, args.verbose);
+launchServer(args.roomname, args.password, args.token, args.bots, args.vps, args.verbose);
