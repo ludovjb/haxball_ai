@@ -36,7 +36,7 @@ async function onGameMessage(callback, data) {
 }
 
 async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots, vps, verbose) {
-    var browserParams = { dumpio: true };
+    var browserParams = { dumpio: verbose };
     if(vps) {
       browserParams.args = ["--disable-features=WebRtcHideLocalIpsWithMdns"];
     }
