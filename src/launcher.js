@@ -1,20 +1,17 @@
+const { ArgumentParser } = require('argparse');
 const { launchServer } = require('./server.js')
 
-const roomName = process.argv[2];
-if (!roomName) {
-    throw "Please provide a room name as a first argument";
-}
+const parser = new ArgumentParser({
+  description: 'Argparse example'
+});
 
-const roomPassword = process.argv[3];
-if (!roomPassword) {
-    throw "Please provide a room password as a second argument";
-}
+parser.add_argument('token', { help: 'Recaptcha token' });
+parser.add_argument('-n', '--name', { help: 'Room name', default: 'HaxBall AI Room' });
+parser.add_argument('-p', '--password', { help: 'Room password', default: 'caen' });
+parser.add_argument('-b', '--bots', { help: 'Number of bots', type: 'int', default: 2});
+parser.add_argument('-v', '--verbose', { help: 'Verbose flag', default: false });
 
-const recaptchaToken = process.argv[4]
-if(!recaptchaToken) {
-  throw "Please provide a repcaptcha token as a third argument";
-}
+args = parser.parse_args();
+console.dir(args);
 
-const numberOfBots = 2;
-
-launchServer(roomName, roomPassword, recaptchaToken, numberOfBots, true);
+launchServer(args.roomname, args.password, args.token, args.bots, args.verbose);
