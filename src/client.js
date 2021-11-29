@@ -74,7 +74,6 @@ async function run () {
     await page.setViewport({ width: 2, height: 2 })
     await page.goto(url);
     await page.waitForSelector("iframe");
-    await page.screenshot({path: 'capture_'+playerName+'.png'});
 
     var frames = await page.frames();
     var myframe = frames.find(f => f.url().indexOf("__cache_static__/g/game.html") > -1);
@@ -85,7 +84,7 @@ async function run () {
     await button.click();
 
     try {
-      await myframe.waitForSelector(".icon-menu", {timeout: 10000});
+      await myframe.waitForSelector(".icon-menu");
     } catch (error) {
       console.error(error);
       await page.screenshot({path: playerName+'.png'});
