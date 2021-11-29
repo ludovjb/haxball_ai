@@ -3,14 +3,14 @@ const { fork } = require('child_process');
 const open = require('open');
 const { createHaxballServer } = require('./haxserver.js')
 
-const serverName = process.argv[2];
-if (!serverName) {
-    throw "Please provide a server name as a first argument";
+const roomName = process.argv[2];
+if (!roomName) {
+    throw "Please provide a room name as a first argument";
 }
 
-const password = process.argv[3];
-if (!password) {
-    throw "Please provide a password as a second argument";
+const roomPassword = process.argv[3];
+if (!roomPassword) {
+    throw "Please provide a room password as a second argument";
 }
 
 const recaptchaToken = process.argv[4]
@@ -52,11 +52,11 @@ async function onGameMessage(callback, data) {
   }
 }
 
-async function run () {
+async function launchServer(roomName, roomPassword, recaptchaToken, verbose=false) {
     const browser = await puppeteer.launch( { dumpio: true });
     const page = await browser.newPage();
 
-    //await page.setViewport({ width: 1900, height: 1024 })
+    await page.setViewport({ width: 2, height: 2 })
     await page.goto("https://www.haxball.com/headless");
     await page.waitForFunction('window.HBInit');
     await page.waitForSelector('iframe');
@@ -66,7 +66,7 @@ async function run () {
 
     await page.exposeFunction("messageToServer", onGameMessage);
 
-    page.evaluate(createHaxballServer, serverName, password, recaptchaToken);
+    page.evaluate(createHaxballServer, roomName, roomPassword, recaptchaToken);
 
     const selectorRoomLink = "#roomlink p a";
     try {
@@ -89,12 +89,10 @@ async function run () {
       await page.waitForTimeout(3000);
     }
 
-
-
-
     while(true) {
       await page.waitForTimeout(3000);
     }
     browser.close();
 }
-run();
+
+launchServer(roomName, roomPassword, recaptchaToken, true);
