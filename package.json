@@ -1,0 +1,17 @@
+{
+  "name": "haxball_ai",
+  "version": "1.0.0",
+  "description": "An haxball server-client framework for AI bot making.",
+  "main": "launcher.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "argparse": "^2.0.1",
+    "child_process": "^1.0.2",
+    "open": "^8.4.0",
+    "puppeteer": "^11.0.0"
+  }
+}
