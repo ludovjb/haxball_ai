@@ -3,22 +3,6 @@ const { fork } = require('child_process');
 const open = require('open');
 const { createHaxballServer } = require('./haxserver.js')
 
-const roomName = process.argv[2];
-if (!roomName) {
-    throw "Please provide a room name as a first argument";
-}
-
-const roomPassword = process.argv[3];
-if (!roomPassword) {
-    throw "Please provide a room password as a second argument";
-}
-
-const recaptchaToken = process.argv[4]
-if(!recaptchaToken) {
-  throw "Please provide a repcaptcha token as a third argument";
-}
-
-const numberOfPlayers = 2;
 let players = [];
 
 var gameCallbacks = {}
@@ -52,7 +36,7 @@ async function onGameMessage(callback, data) {
   }
 }
 
-async function launchServer(roomName, roomPassword, recaptchaToken, verbose=false) {
+async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots, verbose=false) {
     const browser = await puppeteer.launch( { dumpio: true });
     const page = await browser.newPage();
 
@@ -81,7 +65,7 @@ async function launchServer(roomName, roomPassword, recaptchaToken, verbose=fals
     console.log(roomLink);
     open(roomLink);
 
-    for(let p = 0; p < numberOfPlayers; p++) {
+    for(let p = 0; p < numberOfBots; p++) {
       let playerName = "Bot_"+(p+1);
       const child = fork("./src/client.js", [roomLink, playerName]);
       players.push(child);
@@ -94,4 +78,4 @@ async function launchServer(roomName, roomPassword, recaptchaToken, verbose=fals
     browser.close();
 }
 
-launchServer(roomName, roomPassword, recaptchaToken, true);
+module.exports = { launchServer };
