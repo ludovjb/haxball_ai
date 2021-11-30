@@ -49,7 +49,7 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
     await page.waitForSelector('iframe');
 
     var frames = await page.frames();
-    var myframe = frames.find(f => f.url().indexOf("__cache_static__/g/headless.html") > -1);
+    var gameFrame = frames.find(f => f.url().indexOf("__cache_static__/g/headless.html") > -1);
 
     await page.exposeFunction("messageToServer", onGameMessage);
 
@@ -57,14 +57,14 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
 
     const selectorRoomLink = "#roomlink p a";
     try {
-      await myframe.waitForSelector(selectorRoomLink, {timeout: 3000});
+      await gameFrame.waitForSelector(selectorRoomLink, {timeout: 3000});
     } catch (e) {
         console.log("Invalid token ! ");
         browser.close();
         return;
     }
 
-    const roomLink = await myframe.evaluate((selectorRoomLink) => document.querySelector(selectorRoomLink).innerText, selectorRoomLink);
+    const roomLink = await gameFrame.evaluate((selectorRoomLink) => document.querySelector(selectorRoomLink).innerText, selectorRoomLink);
     console.log(roomLink);
 
     if(!vps) {
