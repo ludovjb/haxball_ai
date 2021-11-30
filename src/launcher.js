@@ -4,7 +4,7 @@ const { launchServer } = require('./server.js')
 const DEFAULT_PASSWORD = "caen";
 
 const parser = new ArgumentParser({
-  description: 'Argparse example'
+  description: 'haxball_ai'
 });
 
 parser.add_argument('token', { help: 'Recaptcha token' });
@@ -15,7 +15,10 @@ parser.add_argument('-v', '--verbose', { help: 'Verbose flag', default: false })
 parser.add_argument('--vps', { help: 'If the server will be running on a VPS', action: 'store_true' });
 
 args = parser.parse_args();
-console.dir(args);
+
+if(args.verbose) {
+  console.dir(args);
+}
 
 launchServer(args.roomname, args.password, args.token, args.bots, args.vps, args.verbose);
 
