@@ -1,6 +1,7 @@
 async function createHaxballServer(serverName, password, token) {
   var room = window.HBInit({
     roomName: serverName,
+    password: password ? password : null,
     maxPlayers: 16,
     noPlayer: true,
     public: false,

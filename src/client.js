@@ -6,8 +6,10 @@ if (!url) {
 
 const playerName = process.argv[3];
 if (!playerName) {
-    throw "Please provide a player name as a second argument";
+    throw "Please provide a player name as a third argument";
 }
+
+const roomPassword = process.argv[4];
 
 const RED_TEAM = 1;
 const BLUE_TEAM = 2;
@@ -78,10 +80,17 @@ async function run () {
     var frames = await page.frames();
     var myframe = frames.find(f => f.url().indexOf("__cache_static__/g/game.html") > -1);
 
-    const input = await myframe.$("input[type=text]");
-    await input.type(playerName);
-    const button = await myframe.$("button");
-    await button.click();
+    const inputName = await myframe.$("input[type=text]");
+    await inputName.type(playerName);
+    const buttonName = await myframe.$("button");
+    await buttonName.click();
+
+    if(roomPassword) {
+      const inputPassword = await myframe.$("input[data-hook=input]");
+      await inputPassword.type(roomPassword);
+      const buttonPassword = await myframe.$("button[data-hook=ok]");
+      await buttonPassword.click();
+    }
 
     try {
       await myframe.waitForSelector(".icon-menu");
