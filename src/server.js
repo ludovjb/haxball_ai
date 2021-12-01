@@ -60,7 +60,7 @@ async function onRoomMessage(callback, data) {
     roomCallbacks[callback](data, bots);
   }
   else {
-    console.log("The following callback function doesn't exist : "+callback);
+    console.error("The following server callback function doesn't exist : "+callback);
   }
 }
 

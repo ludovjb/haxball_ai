@@ -73,7 +73,7 @@ async function onServerMessage(message, page) {
     botCallbacks[message.callback](message.data, bot, page);
   }
   else {
-    console.log("The following callback function doesn't exist : "+message.callback);
+    console.error("The following client callback function doesn't exist : "+message.callback);
   }
 }
 
