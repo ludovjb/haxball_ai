@@ -1,39 +1,9 @@
 const puppeteer = require('puppeteer');
 const { fork } = require('child_process');
 const { createHaxballRoom } = require('./haxserver.js')
+const roomCallbacks = require('./server_callbacks.js')
 
-let players = [];
-
-var gameCallbacks = {}
-gameCallbacks.onGameTick = async function(data) {
-  //if(data.tickNumber % 10 == 0) {
-    //console.log("TICK : "+data.tickNumber + " ball x="+data.ball.x+" y="+data.ball.y);
-    /*data.players.forEach((player, i) => {
-      if(player.position == null)
-        return;
-      console.log("    "+player.name + " x="+player.position.x+" y="+player.position.y);
-    });*/
-    players.forEach(child => child.send({ callback: "onGameTick", data: data }));
-  //}
-}
-
-gameCallbacks.onPlayerChat = async function(data) {
-  console.log(data);
-  players.forEach(child => child.send({ callback: "onPlayerChat", data: data }));
-}
-
-gameCallbacks.onPlayerJoin = async function(data) {
-  console.log(data + " has joined the server");
-}
-
-async function onGameMessage(callback, data) {
-  if(callback in gameCallbacks && typeof gameCallbacks[callback] === "function") {
-    gameCallbacks[callback](data);
-  }
-  else {
-    console.log("The following callback function doesn't exist : "+callback);
-  }
-}
+let bots = [];
 
 async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots, vps, verbose) {
     var browserParams = { dumpio: verbose };
@@ -51,7 +21,7 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
     var frames = await page.frames();
     var gameFrame = frames.find(f => f.url().indexOf("__cache_static__/g/headless.html") > -1);
 
-    await page.exposeFunction("messageToServer", onGameMessage);
+    await page.exposeFunction("messageToServer", onRoomMessage);
 
     page.evaluate(createHaxballRoom, roomName, roomPassword, recaptchaToken);
 
@@ -72,11 +42,10 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
       open(roomLink);
     }
 
-
     for(let p = 0; p < numberOfBots; p++) {
       let playerName = "Bot_"+(p+1);
       const child = fork("./src/client.js", [roomLink, playerName, roomPassword]);
-      players.push(child);
+      bots.push(child);
       console.log(playerName + " has been created and forked");
     }
 
@@ -84,6 +53,15 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
       await page.waitForTimeout(3000);
     }
     browser.close();
+}
+
+async function onRoomMessage(callback, data) {
+  if(callback in roomCallbacks && typeof roomCallbacks[callback] === "function") {
+    roomCallbacks[callback](data, bots);
+  }
+  else {
+    console.log("The following callback function doesn't exist : "+callback);
+  }
 }
 
 module.exports = { launchServer };
