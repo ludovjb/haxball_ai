@@ -93,19 +93,23 @@ async function resetAllKeysExceptFor(page, ...exceptions) {
   });
 }
 
+function computePlayerVelocity(playerId, lastData, currentData) {
+  if(lastData && lastData.players[playerId] && lastData.players[playerId].position &&
+    currentData && currentData.players[playerId] && currentData.players[playerId].position) {
+    var lastPlayerPosition = lastData.players[playerId].position;
+    var curPlayerPosition = currentData.players[playerId].position;
+    return vec.div(vec.sub(curPlayerPosition, lastPlayerPosition), lastData.tick - currentData.tick);
+  }
+  return playerVelocity = { x: 0, y: 0 };
+}
+
 function getBotRelativeGameEnv(lastData, currentData, botName) {
   var localPlayer = Object.values(currentData.players).find((player) => player.name == botName);
   if(!localPlayer || !localPlayer.position) {
     return null;
   }
 
-  var botVelocity;
-  if(lastData && lastData.players[localPlayer.id]) {
-    botVelocity = vec.div(vec.sub(localPlayer.position, lastData.players[localPlayer.id].position), lastData.tick - currentData.tick);
-  }
-  else {
-    botVelocity = { x: 0, y: 0 };
-  }
+  var botVelocity = computePlayerVelocity(localPlayer.id, lastData, currentData);
 
   var ballVelocity;
   if(lastData) {
@@ -147,16 +151,7 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
       return;
     }
 
-    var playerVelocity;
-    if(lastData && lastData.players[player.id] && lastData.players[player.id].position &&
-      currentData && currentData.players[player.id] && currentData.players[player.id].position) {
-      var lastPlayerPosition = lastData.players[player.id].position;
-      var curPlayerPosition = currentData.players[player.id].position;
-      playerVelocity = vec.div(vec.sub(curPlayerPosition, lastPlayerPosition), lastData.tick - currentData.tick);
-    }
-    else {
-      playerVelocity = { x: 0, y: 0 };
-    }
+    var playerVelocity = computePlayerVelocity(player.id, lastData, currentData);
 
     var relativePlayerInfo = {
       id: player.id,
