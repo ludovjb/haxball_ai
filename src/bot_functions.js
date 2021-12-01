@@ -163,28 +163,12 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
   });
 
   if(localPlayer.team == BLUE_TEAM) {
-    reverseVectors(relativeEnv);
-  }
-  return relativeEnv;
-}
-
-function reverseVectors(object) {
-  if(typeof object === 'object') {
-    if("x" in object && "y" in object && Object.keys(object).length == 2) {
-      object.x *= -1;
-      object.y *= -1;
-    }
-    else {
-      Object.keys(object).forEach((key) => {
-        reverseVectors(object[key]);
-      });
-    }
-  }
-  else if(Array.isArray(object)) {
-    object.forEach((arrayObject) => {
-      reverseVectors(arrayObject);
+    vec.transformVectors(relativeEnv, (vector) => {
+      vector.x *= -1;
+      vector.y *= -1;
     });
   }
+  return relativeEnv;
 }
 
 module.exports = { applyAction, resetAllKeysExceptFor, getBotRelativeGameEnv }
