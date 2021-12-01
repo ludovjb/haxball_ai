@@ -4,6 +4,9 @@ function action(env) {
     return "kick";
   }
 
+  if(env.ball.position.x == -env.bot.position.x && env.ball.position.y == 0) {
+    return "forward";
+  }
   if(env.ball.position.x >= 0 && env.ball.position.y >= 0) {
     return "forward-right";
   }
