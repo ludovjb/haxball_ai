@@ -1,13 +1,11 @@
+const conf = require('./config.js');
 var vec = require('./vectors.js')
 
-const SPECTATORS = 0;
-const RED_TEAM = 1;
-const BLUE_TEAM = 2;
 
 const keyHold = {};
 
 async function applyAction(team, actionName, page) {
-  if(team != RED_TEAM && team != BLUE_TEAM) {
+  if(team != conf.RED_TEAM && team != conf.BLUE_TEAM) {
     await resetAllKeysExceptFor(page);
     return;
   }
@@ -49,13 +47,13 @@ async function applyAction(team, actionName, page) {
 function getCommandKeys(team, commandName) {
   switch (commandName) {
     case "forward":
-      return team == RED_TEAM ? "ArrowRight" : getOppositeCommand("ArrowRight");
+      return team == conf.RED_TEAM ? "ArrowRight" : getOppositeCommand("ArrowRight");
     case "backward":
-      return team == RED_TEAM ? "ArrowLeft" : getOppositeCommand("ArrowLeft");
+      return team == conf.RED_TEAM ? "ArrowLeft" : getOppositeCommand("ArrowLeft");
     case "right":
-      return team == RED_TEAM ? "ArrowDown" : getOppositeCommand("ArrowDown");
+      return team == conf.RED_TEAM ? "ArrowDown" : getOppositeCommand("ArrowDown");
     case "left":
-      return team == RED_TEAM ? "ArrowUp" : getOppositeCommand("ArrowUp");
+      return team == conf.RED_TEAM ? "ArrowUp" : getOppositeCommand("ArrowUp");
     case "kick":
       return "Space";
   }
@@ -128,8 +126,8 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
       velocity: botVelocity
     },
     score: {
-      ownTeam: localPlayer.team == RED_TEAM ? currentData.scores.red : currentData.scores.blue,
-      opponentTeam: localPlayer.team == RED_TEAM ? currentData.scores.blue : currentData.scores.red,
+      ownTeam: localPlayer.team == conf.RED_TEAM ? currentData.scores.red : currentData.scores.blue,
+      opponentTeam: localPlayer.team == conf.RED_TEAM ? currentData.scores.blue : currentData.scores.red,
       scoreLimit: currentData.scores.scoreLimit,
       time: currentData.scores.time,
       timeLimit: currentData.scores.timeLimit
@@ -147,7 +145,7 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
       return;
     }
 
-    if(!player.position || player.team == SPECTATORS) {
+    if(!player.position || player.team == conf.SPECTATORS) {
       return;
     }
 
@@ -162,7 +160,7 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
     (player.team == localPlayer.team ? relativeEnv.teammates : relativeEnv.opponents).push(relativePlayerInfo);
   });
 
-  if(localPlayer.team == BLUE_TEAM) {
+  if(localPlayer.team == conf.BLUE_TEAM) {
     vec.transformVectors(relativeEnv, (vector) => {
       vector.x *= -1;
       vector.y *= -1;
