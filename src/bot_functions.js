@@ -8,7 +8,7 @@ const keyHold = {};
 
 async function applyAction(team, actionName, page) {
   if(team != RED_TEAM && team != BLUE_TEAM) {
-    await resetAllKeysExceptFor(page); 
+    await resetAllKeysExceptFor(page);
     return;
   }
 
@@ -123,6 +123,13 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
       position: localPlayer.position,
       velocity: botVelocity
     },
+    score: {
+      ownTeam: localPlayer.team == RED_TEAM ? currentData.scores.red : currentData.scores.blue,
+      opponentTeam: localPlayer.team == RED_TEAM ? currentData.scores.blue : currentData.scores.red,
+      scoreLimit: currentData.scores.scoreLimit,
+      time: currentData.scores.time,
+      timeLimit: currentData.scores.timeLimit
+    },
     ball: {
       position: vec.sub(currentData.ball, localPlayer.position),
       velocity: ballVelocity,
@@ -130,7 +137,6 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
     teammates: [],
     opponents: []
   };
-
 
   Object.values(currentData.players).forEach((player) => {
     if(player.id == localPlayer.id) {

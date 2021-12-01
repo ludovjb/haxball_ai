@@ -41,6 +41,7 @@ async function createHaxballRoom(serverName, password, token) {
     });
 
     data.tick = tickNumber;
+    data.scores = room.getScores();
     window.messageToServer("onGameTick", data);
   }
 
