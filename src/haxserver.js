@@ -45,15 +45,6 @@ async function createHaxballRoom(serverName, password, token) {
     window.messageToServer("onGameTick", data);
   }
 
-  room.onPlayerChat = function(player, message) {
-    window.messageToServer("onPlayerChat", message); //.substring(2));
-    /*if(message.startsWith('!!')) {
-      window.messageToServer("onPlayerChat", message.substring(2));
-      return false;
-    }*/
-    return true;
-  }
-
   room.onPositionsReset = function() {
     window.messageToServer("onPositionsReset", {});
   }
