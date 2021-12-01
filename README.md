@@ -1,6 +1,6 @@
 # haxball_ai
 
-- Install the dependencies (Node.js version 17).
+- Install the dependencies (Node.js version 17) :
 `npm install`
 
 - Read the doc about optional args :
