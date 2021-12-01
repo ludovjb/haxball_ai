@@ -17,6 +17,7 @@ async function onGameTick(data, bot, page) {
 
   var environment = getBotRelativeGameEnv(lastTickData, data, bot.name);
   if(!environment) {
+    lastTickData = null;
     return; // the bot is not in the game
   }
   lastTickData = data;
