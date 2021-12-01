@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const { fork } = require('child_process');
-const { createHaxballServer } = require('./haxserver.js')
+const { createHaxballRoom } = require('./haxserver.js')
 
 let players = [];
 
@@ -53,7 +53,7 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
 
     await page.exposeFunction("messageToServer", onGameMessage);
 
-    page.evaluate(createHaxballServer, roomName, roomPassword, recaptchaToken);
+    page.evaluate(createHaxballRoom, roomName, roomPassword, recaptchaToken);
 
     const selectorRoomLink = "#roomlink p a";
     try {

@@ -1,4 +1,4 @@
-async function createHaxballServer(serverName, password, token) {
+async function createHaxballRoom(serverName, password, token) {
   var room = window.HBInit({
     roomName: serverName,
     password: password ? password : null,
@@ -53,4 +53,4 @@ async function createHaxballServer(serverName, password, token) {
 }
 
 
-module.exports = { createHaxballServer };
+module.exports = { createHaxballRoom };
