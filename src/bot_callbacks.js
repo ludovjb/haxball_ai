@@ -29,4 +29,9 @@ async function onPlayerChat(data, bot, page) {
   await resetAllKeysExceptFor(page);
 }
 
-module.exports = { onGameTick, onPlayerChat };
+async function onPositionsReset(data, bot, page) {
+  lastTickData = null;
+  await resetAllKeysExceptFor(page);
+}
+
+module.exports = { onGameTick, onPlayerChat, onPositionsReset };

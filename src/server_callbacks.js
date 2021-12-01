@@ -11,8 +11,12 @@ async function onPlayerJoin(data, bots) {
   console.log(data + " has joined the server");
 };
 
+async function onPositionsReset(data, bots) {
+  sendMessageToBots(bots, "onPositionsReset", {});
+};
+
 async function sendMessageToBots(bots, callbackName, data) {
   bots.forEach(bot => bot.send({ callback: callbackName, data: data }));
 }
 
-module.exports = { onGameTick, onPlayerChat, onPlayerJoin };
+module.exports = { onGameTick, onPlayerChat, onPlayerJoin, onPositionsReset };

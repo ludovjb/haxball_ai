@@ -54,6 +54,10 @@ async function createHaxballRoom(serverName, password, token) {
     return true;
   }
 
+  room.onPositionsReset = function() {
+    window.messageToServer("onPositionsReset", {});
+  }
+
   return room;
 }
 
