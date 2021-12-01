@@ -35,7 +35,11 @@ async function createHaxballRoom(serverName, password, token) {
     //var playerList = room.getPlayerList();
     var data = {};
     data.ball = room.getBallPosition();
-    data.players = room.getPlayerList();
+    data.players = {};
+    room.getPlayerList().forEach((player) => {
+      data.players[player.id] = player;
+    });
+
     data.tickNumber = tickNumber;
     window.messageToServer("onGameTick", data);
   }

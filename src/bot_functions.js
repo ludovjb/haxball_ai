@@ -1,11 +1,14 @@
+var vec = require('./vectors.js')
+
+const SPECTATORS = 0;
 const RED_TEAM = 1;
 const BLUE_TEAM = 2;
 
 const keyHold = {};
 
-async function action(team, actionName, page) {
+async function applyAction(team, actionName, page) {
   if(team != RED_TEAM && team != BLUE_TEAM) {
-    await resetAllKeysExceptFor(page);
+    await resetAllKeysExceptFor(page); // FIXME useful ?
     return;
   }
 
@@ -95,4 +98,94 @@ async function resetAllKeysExceptFor(page, ...exceptions) {
   });
 }
 
-module.exports = { action, resetAllKeysExceptFor }
+function getBotRelativeGameEnv(lastData, currentData, botName) {
+  var localPlayer = Object.values(currentData.players).find((player) => player.name == botName);
+  if(!localPlayer || !localPlayer.position) {
+    return null;
+  }
+
+  var botVelocity;
+  if(lastData && lastData.players[localPlayer.id]) {
+    botVelocity = vec.div(vec.sub(lastData.players[localPlayer.id].position, localPlayer.position), lastData.tickNumber - currentData.tickNumber);
+  }
+  else {
+    botVelocity = { x: 0, y: 0 };
+  }
+
+  var ballVelocity;
+  if(lastData) {
+    ballVelocity = vec.div(vec.sub(lastData.ball, currentData.ball), lastData.tickNumber - currentData.tickNumber);
+  }
+  else {
+    ballVelocity = { x: 0, y: 0 };
+  }
+
+  var relativeEnv = {
+    tick: currentData.tickNumber,
+    bot: {
+      id: localPlayer.id,
+      team: localPlayer.team,
+      position: localPlayer.position,
+      velocity: botVelocity
+    },
+    ball: {
+      position: vec.sub(currentData.ball, localPlayer.position),
+      velocity: ballVelocity,
+    },
+    teammates: [],
+    opponents: []
+  };
+
+
+  Object.values(currentData.players).forEach((player) => {
+    if(player.id == localPlayer.id) {
+      return;
+    }
+
+    if(!player.position || player.team == SPECTATORS) {
+      return;
+    }
+
+    var playerVelocity;
+    if(lastData && lastData.players[player.id]) {
+      playerVelocity = vec.div(vec.sub(lastData.players[player.id].position, localPlayer.position), lastData.tickNumber - currentData.tickNumber);
+    }
+    else {
+      playerVelocity = { x: 0, y: 0 };
+    }
+
+    var relativePlayerInfo = {
+      id: player.id,
+      position: vec.sub(player.position, localPlayer.position),
+      velocity: playerVelocity
+    };
+
+    (player.team == localPlayer.team ? relativeEnv.teammates : relativeEnv.opponents).push(relativePlayerInfo);
+  });
+
+  if(localPlayer.team == BLUE_TEAM) {
+    reverseVectors(relativeEnv);
+  }
+  return relativeEnv;
+}
+
+function reverseVectors(object) {
+  if(typeof object === 'object') {
+    if("x" in object && "y" in object && Object.keys(object).length == 2) {
+      object.x *= -1;
+      object.y *= -1;
+    }
+    else {
+      Object.keys(object).forEach((key) => {
+        reverseVectors(object[key]);
+      });
+    }
+  }
+  else if(Array.isArray(object)) {
+    object.forEach((arrayObject) => {
+      reverseVectors(arrayObject);
+    });
+  }
+}
+
+module.exports = { applyAction, resetAllKeysExceptFor, getBotRelativeGameEnv }
