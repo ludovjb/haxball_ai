@@ -101,7 +101,7 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
 
   var botVelocity;
   if(lastData && lastData.players[localPlayer.id]) {
-    botVelocity = vec.div(vec.sub(lastData.players[localPlayer.id].position, localPlayer.position), lastData.tickNumber - currentData.tickNumber);
+    botVelocity = vec.div(vec.sub(lastData.players[localPlayer.id].position, localPlayer.position), lastData.tick - currentData.tick);
   }
   else {
     botVelocity = { x: 0, y: 0 };
@@ -109,14 +109,14 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
 
   var ballVelocity;
   if(lastData) {
-    ballVelocity = vec.div(vec.sub(lastData.ball, currentData.ball), lastData.tickNumber - currentData.tickNumber);
+    ballVelocity = vec.div(vec.sub(lastData.ball, currentData.ball), lastData.tick - currentData.tick);
   }
   else {
     ballVelocity = { x: 0, y: 0 };
   }
 
   var relativeEnv = {
-    tick: currentData.tickNumber,
+    tick: currentData.tick,
     bot: {
       id: localPlayer.id,
       team: localPlayer.team,
@@ -143,7 +143,7 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
 
     var playerVelocity;
     if(lastData && lastData.players[player.id]) {
-      playerVelocity = vec.div(vec.sub(lastData.players[player.id].position, localPlayer.position), lastData.tickNumber - currentData.tickNumber);
+      playerVelocity = vec.div(vec.sub(lastData.players[player.id].position, localPlayer.position), lastData.tick - currentData.tick);
     }
     else {
       playerVelocity = { x: 0, y: 0 };

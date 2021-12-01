@@ -40,7 +40,7 @@ async function createHaxballRoom(serverName, password, token) {
       data.players[player.id] = player;
     });
 
-    data.tickNumber = tickNumber;
+    data.tick = tickNumber;
     window.messageToServer("onGameTick", data);
   }
 
