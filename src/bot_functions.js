@@ -80,11 +80,7 @@ async function pressKeys(page, ...commandKeys) {
     if(!(commandKey in keyHold) || !keyHold[commandKey]) {
       await page.keyboard.down(commandKey);
       keyHold[commandKey] = true;
-      //console.log(" press "+commandKey)
     }
-    /*else {
-      console.log(" not press "+commandKey);
-    }*/
   });
 }
 
@@ -93,7 +89,6 @@ async function resetAllKeysExceptFor(page, ...exceptions) {
     if(keyHold[commandKey] && !exceptions.includes(commandKey)) {
       await page.keyboard.up(commandKey);
       keyHold[commandKey] = false;
-      //console.log(" reset "+commandKey)
     }
   });
 }
