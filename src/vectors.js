@@ -26,4 +26,8 @@ function reverse(vec, axeX = -1, axeY = -1) {
    }
 }
 
-module.exports = { add, sub, div, reverse };
+function normL2(vec) {
+  return Math.sqrt(Math.pow(vec.x, 2) + Math.pow(vec.y, 2));
+}
+
+module.exports = { add, sub, div, reverse, l2norm };

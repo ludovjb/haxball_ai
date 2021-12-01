@@ -1,5 +1,7 @@
+const vec = require('./vectors.js');
+
 function action(env) {
-  let distanceWithBall = Math.sqrt(Math.pow(env.ball.position.x, 2)+Math.pow(env.ball.position.y, 2));
+  let distanceWithBall = vec.normL2(env.ball.position);
   if(distanceWithBall < 25.5) {
     return "kick";
   }
