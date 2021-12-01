@@ -8,7 +8,7 @@ const keyHold = {};
 
 async function applyAction(team, actionName, page) {
   if(team != RED_TEAM && team != BLUE_TEAM) {
-    await resetAllKeysExceptFor(page); // FIXME useful ?
+    await resetAllKeysExceptFor(page); 
     return;
   }
 
