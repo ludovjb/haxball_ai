@@ -161,10 +161,10 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
   });
 
   if(localPlayer.team == conf.BLUE_TEAM) {
-    vec.transformVectors(relativeEnv, (vector) => {
-      vector.x *= -1;
-      vector.y *= -1;
-    });
+    vec.transformVectors(relativeEnv, (vector) => ({
+      x: vector.x * -1,
+      y: vector.y * -1
+    }));
   }
   return relativeEnv;
 }
