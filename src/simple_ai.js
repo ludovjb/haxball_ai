@@ -6,23 +6,37 @@ function action(env) {
     return "kick";
   }
 
-  if(env.ball.position.x == -env.bot.position.x && env.ball.position.y == 0) {
+  var angle = vec.angle(env.ball.position);
+
+  if(approxEquals(angle, 0)) {
     return "forward";
   }
-  if(env.ball.position.x >= 0 && env.ball.position.y >= 0) {
-    return "forward-right";
-  }
-  else if(env.ball.position.x <= 0 && env.ball.position.y >= 0) {
-    return "backward-right";
-  }
-  else if(env.ball.position.x >= 0 && env.ball.position.y <= 0) {
+  else if(approxEquals(angle, 45)) {
     return "forward-left";
   }
-  else if(env.ball.position.x <= 0 && env.ball.position.y <= 0) {
+  else if(approxEquals(angle, 90)) {
+    return "left";
+  }
+  else if(approxEquals(angle, 135)) {
     return "backward-left";
   }
-
+  else if(approxEquals(Math.abs(angle), 180)) {
+    return "backward";
+  }
+  else if(approxEquals(angle, -135)) {
+    return "backward-right";
+  }
+  else if(approxEquals(angle, -90)) {
+    return "right";
+  }
+  else /*if(approxEquals(angle, -45))*/ {
+    return "forward-right";
+  }
   return "none";
+}
+
+function approxEquals(v1, v2) {
+  return Math.abs(v1-v2) <= 22.5;
 }
 
 module.exports = { action };
