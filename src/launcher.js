@@ -22,9 +22,6 @@ if(args.verbose) {
   console.dir(args);
 }
 
-console.log("The room password is : "+args.password);
-console.log("The admin token is : "+args.admin);
-
 launchServer(args.name, args.password, args.token, args.bots, args.redteam, args.blueteam, args.admin, args.vps, args.verbose);
 
 function checkPasswordValue(password) {
@@ -40,6 +37,7 @@ function checkAIActionFile(fileName) {
     const { action } = require(fileName);
   } catch (error) {
     console.error("An error has occured with the following action file : "+fileName);
+    console.error(error);
     process.exit(1);
   }
   return fileName;

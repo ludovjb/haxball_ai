@@ -36,12 +36,20 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
     }
 
     const roomLink = await gameFrame.evaluate((selectorRoomLink) => document.querySelector(selectorRoomLink).innerText, selectorRoomLink);
-    console.log(roomLink);
 
     if(!vps) {
       const open = require('open');
       open(roomLink);
     }
+
+    console.log("**************************************************")
+    console.log("The room link is :");
+    console.log("");
+    console.log(roomLink);
+    console.log("")
+    console.log("The room password is : "+args.password);
+    console.log("The admin token is : "+args.admin);
+    console.log("**************************************************")
 
     var counter=0;
     for(let p = 0; p < numberOfBotsPerTeam; p++) {
@@ -53,9 +61,6 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
         console.log(playerName + " has been created and forked");
       });
     }
-
-
-
 
     while(true) {
       await page.waitForTimeout(3000);
