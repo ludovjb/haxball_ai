@@ -9,8 +9,6 @@
 ```
 usage: launcher.js [-h] [-n NAME] [-p PASSWORD] [-b BOTS] [--redteam REDTEAM] [--blueteam BLUETEAM] [--admin ADMIN] [-v] [--vps] token
 
-haxball_ai
-
 positional arguments:
   token                 Recaptcha token
 

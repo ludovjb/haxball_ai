@@ -2,9 +2,7 @@ const { ArgumentParser } = require('argparse');
 const conf = require('./config.js');
 const { launchServer } = require('./server.js')
 
-const parser = new ArgumentParser({
-  description: 'haxball_ai'
-});
+const parser = new ArgumentParser();
 
 parser.add_argument('token', { help: 'Recaptcha token' });
 parser.add_argument('-n', '--name', { help: 'Room name', default: 'HaxBall AI Room' });
