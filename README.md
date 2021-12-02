@@ -69,7 +69,7 @@ An example of environment is given below :
  
  #### Position vectors
  
-All the position vectors (ball, teammates and opponents) are relative to the agent position. The latter is relative to the center of the pitch : (0, 0).
+All position vectors (ball, teammates and opponents) are relative to the agent position. The latter is relative to the center of the pitch : (0, 0).
  
  #### Velocity vectors
  
