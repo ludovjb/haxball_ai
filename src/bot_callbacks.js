@@ -29,6 +29,12 @@ async function onGameTick(data, bot, page) {
       if(delayBeforePlay % 8 == 0) {
         applyAction(1, "kick", page);
       }
+      else if(delayBeforePlay == 10) {
+        applyAction(1, "right", page);
+      }
+      else if(delayBeforePlay == 20) {
+        applyAction(1, "left", page);
+      }
       delayBeforePlay--;
     }
     return;
