@@ -96,7 +96,7 @@ function computePlayerVelocity(playerId, lastData, currentData) {
     currentData && currentData.players[playerId] && currentData.players[playerId].position) {
     var lastPlayerPosition = lastData.players[playerId].position;
     var curPlayerPosition = currentData.players[playerId].position;
-    return vec.div(vec.sub(curPlayerPosition, lastPlayerPosition), lastData.tick - currentData.tick);
+    return vec.div(vec.sub(curPlayerPosition, lastPlayerPosition), currentData.tick - lastData.tick);
   }
   return playerVelocity = { x: 0, y: 0 };
 }
@@ -111,7 +111,7 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
 
   var ballVelocity;
   if(lastData) {
-    ballVelocity = vec.div(vec.sub(currentData.ball, lastData.ball), lastData.tick - currentData.tick);
+    ballVelocity = vec.div(vec.sub(currentData.ball, lastData.ball), currentData.tick - lastData.tick);
   }
   else {
     ballVelocity = { x: 0, y: 0 };
