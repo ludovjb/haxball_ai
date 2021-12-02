@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const botCallbacks = require('./bot_callbacks.js');
+const conf = require('./config.js');
 
 const url = process.argv[2];
 if (!url) {
@@ -7,14 +8,29 @@ if (!url) {
 }
 
 const bot = {
-  name: process.argv[3]
+  name: process.argv[3],
+  team: parseInt(process.argv[4]),
+  actionFile: process.argv[5],
+  adminToken: process.argv[6],
 };
 
 if (!bot.name) {
     throw "Please provide a bot name as a third argument";
 }
 
-const roomPassword = process.argv[4];
+if (!bot.team) {
+    throw "Please provide a bot name as a fourth argument";
+}
+
+if (!bot.actionFile) {
+    throw "Please provide an action file as a fifth argument";
+}
+
+if (!bot.adminToken) {
+    throw "Please provide an admin token as a sixth argument";
+}
+
+const roomPassword = process.argv[7];
 
 async function run () {
     const browser = await puppeteer.launch();
@@ -45,19 +61,10 @@ async function run () {
       await page.screenshot({path: bot.name+'.png'});
     }
     await myframe.waitForSelector(".icon-menu", {timeout: (999999999)});
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('/');
-    await page.keyboard.press('a');
-    await page.keyboard.press('v');
-    await page.keyboard.press('a');
-    await page.keyboard.press('t');
-    await page.keyboard.press('a');
-    await page.keyboard.press('r');
-    await page.keyboard.press(' ');
-    await page.keyboard.press('a');
-    await page.keyboard.press('i');
-    await page.keyboard.press('Enter');
-    await page.waitForTimeout(500);
+
+    await sendChat(page, "/avatar ai");
+    await sendChat(page, "!admin "+bot.adminToken);
+    await sendChat(page, "!moveteam "+bot.adminToken+" "+bot.team);
 
     process.on('message', (message) => onServerMessage(message, page));
 
@@ -66,6 +73,12 @@ async function run () {
     }
     console.log("End of connection for "+bot.name);
     browser.close();
+}
+
+async function sendChat(page, message) {
+  await page.keyboard.press('Tab');
+  await page.keyboard.type(message);
+  await page.keyboard.press('Enter');
 }
 
 async function onServerMessage(message, page) {

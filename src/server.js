@@ -1,11 +1,12 @@
 const puppeteer = require('puppeteer');
 const { fork } = require('child_process');
+const conf = require('./config.js');
 const { createHaxballRoom } = require('./haxserver.js')
 const roomCallbacks = require('./server_callbacks.js')
 
 let bots = [];
 
-async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots, vps, verbose) {
+async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBotsPerTeam, redTeamActionFile, blueTeamActionFile, adminToken, vps, verbose) {
     var browserParams = { dumpio: verbose };
     if(vps) {
       browserParams.args = ["--disable-features=WebRtcHideLocalIpsWithMdns"];
@@ -23,7 +24,7 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
 
     await page.exposeFunction("messageToServer", onRoomMessage);
 
-    page.evaluate(createHaxballRoom, roomName, roomPassword, recaptchaToken);
+    page.evaluate(createHaxballRoom, roomName, roomPassword, recaptchaToken, adminToken);
 
     const selectorRoomLink = "#roomlink p a";
     try {
@@ -42,12 +43,19 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
       open(roomLink);
     }
 
-    for(let p = 0; p < numberOfBots; p++) {
-      let playerName = "Bot_"+(p+1);
-      const child = fork("./src/client.js", [roomLink, playerName, roomPassword]);
-      bots.push(child);
-      console.log(playerName + " has been created and forked");
+    var counter=0;
+    for(let p = 0; p < numberOfBotsPerTeam; p++) {
+      [redTeamActionFile, blueTeamActionFile].forEach((actionFile, i) => {
+        counter += 1;
+        let playerName = "Bot_"+counter;
+        const child = fork("./src/client.js", [roomLink, playerName, i+1, actionFile, adminToken, roomPassword]);
+        bots.push(child);
+        console.log(playerName + " has been created and forked");
+      });
     }
+
+
+
 
     while(true) {
       await page.waitForTimeout(3000);
