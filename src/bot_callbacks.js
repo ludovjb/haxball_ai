@@ -27,13 +27,13 @@ async function onGameTick(data, bot, page) {
     await resetAllKeysExceptFor(page);
     if(delayBeforePlay < conf.MAX_DELAY_BEFORE_PLAY) {
       if(delayBeforePlay % 8 == 0) {
-        applyAction(1, "kick", page);
+        applyAction(environment.bot.team, "kick", page);
       }
       else if(delayBeforePlay == 10) {
-        applyAction(1, "right", page);
+        applyAction(environment.bot.team, "right", page);
       }
       else if(delayBeforePlay == 20) {
-        applyAction(1, "left", page);
+        applyAction(environment.bot.team, "left", page);
       }
       delayBeforePlay--;
     }
