@@ -23,10 +23,16 @@ function normL2(vec) {
   return Math.sqrt(Math.pow(vec.x, 2) + Math.pow(vec.y, 2));
 }
 
+function angle(vec1, vec2) {
+    var rad = Math.atan2(vec2.y,vec2.x) - Math.atan2(vec1.y,vec1.x);
+    var deg = rad*(180/Math.PI);
+    return deg;
+}
+
 function transformVectors(object, operation) {
   if(typeof object === 'object') {
     if("x" in object && "y" in object && Object.keys(object).length == 2) {
-      operation(object);
+      object = operation(object);
     }
     else {
       Object.keys(object).forEach((key) => {
@@ -41,4 +47,4 @@ function transformVectors(object, operation) {
   }
 }
 
-module.exports = { add, sub, div, normL2, transformVectors };
+module.exports = { add, sub, div, normL2, angle, transformVectors };
