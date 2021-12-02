@@ -161,7 +161,7 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
   });
 
   if(localPlayer.team == conf.BLUE_TEAM) {
-    vec.transformVectors(relativeEnv, (vector) => ({
+    relativeEnv = vec.transformVectors(relativeEnv, (vector) => ({
       x: vector.x * -1,
       y: vector.y * -1
     }));
