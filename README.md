@@ -34,7 +34,7 @@ This project allows to build AI agents by defining the action function, in a sin
 
 The action function has a single argument, which is a javascript object that contains information about the agent's environment at a specific time (tick). According to the [haxball's documentation](https://github.com/haxball/haxball-issues/wiki/Headless-Host), the room generates 60 ticks per second.
 
-An example of environment is given 
+An example of environment is given below :
 ```yaml
 {
   tick: 5460, # tick number, it increments over time
