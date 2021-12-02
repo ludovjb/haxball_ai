@@ -28,7 +28,7 @@ optional arguments:
 
 ## AI agents
 
-This project allows to build AI agents by defining the action function. An example is given [here](src/simple_ai.js).
+This project allows to build AI agents by defining the action function, in a single .js file. An example is given [here](src/simple_ai.js).
 
 ### Environment
 
