@@ -6,7 +6,11 @@
 - Read the doc about optional args :
 `node src/launcher --help`
 
-````
+```
+usage: launcher.js [-h] [-n NAME] [-p PASSWORD] [-b BOTS] [--redteam REDTEAM] [--blueteam BLUETEAM] [--admin ADMIN] [-v] [--vps] token
+
+haxball_ai
+
 positional arguments:
   token                 Recaptcha token
 
@@ -21,7 +25,7 @@ optional arguments:
   --admin ADMIN         Admin token
   -v, --verbose         Verbose flag
   --vps                 If the server will be running on a VPS
-  ````
+  ```
 
 - Launch the server with a token from [here](https://www.haxball.com/headlesstoken) :
 `node src/launcher {token}`
