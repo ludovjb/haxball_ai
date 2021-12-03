@@ -17,6 +17,8 @@ async function onGameTick(data, bot, page) {
     return;
   }
 
+  var goalJustScored = lastTickData.scores.red != data.scores.red || lastTickData.scores.blue != data.scores.blue;
+
   var environment = getBotRelativeGameEnv(lastTickData, data, bot.name);
   if(!environment) {
     return; // the bot is not in the game
@@ -40,6 +42,10 @@ async function onGameTick(data, bot, page) {
     return;
   }
 
+  if(goalJustScored) {
+    delayBeforePlay = conf.MAX_DELAY_BEFORE_PLAY;
+  }
+
   if(!actionFunction) {
     const { action } = require(bot.actionFile);
     actionFunction = action;
@@ -52,13 +58,9 @@ async function onPositionsReset(data, bot, page) {
   delayBeforePlay = conf.DELAY_BEFORE_PLAY;
 }
 
-async function onTeamGoal(data, bot, page) {
-  delayBeforePlay = conf.MAX_DELAY_BEFORE_PLAY;
-}
-
 async function onGameStart(data, bot, page) {
   delayBeforePlay = conf.DELAY_BEFORE_PLAY;
   lastTickData = null;
 }
 
-module.exports = { onGameTick, onPositionsReset, onTeamGoal, onGameStart };
+module.exports = { onGameTick, onPositionsReset, onGameStart };

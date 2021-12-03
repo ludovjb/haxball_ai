@@ -39,10 +39,6 @@ async function createHaxballRoom(serverName, password, recaptchaToken, adminToke
     window.messageToServer("onPositionsReset", {});
   }
 
-  room.onTeamGoal = function(teamId) {
-    window.messageToServer("onTeamGoal", {});
-  }
-
   room.onGameStart = function(byPlayer) {
     tickNumber = 0;
     window.messageToServer("onGameStart", {});

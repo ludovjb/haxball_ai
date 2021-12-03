@@ -10,10 +10,6 @@ async function onPositionsReset(data, bots) {
   sendMessageToBots(bots, "onPositionsReset", {});
 };
 
-async function onTeamGoal(data, bots) {
-  sendMessageToBots(bots, "onTeamGoal", {});
-};
-
 async function onGameStart(data, bots) {
   sendMessageToBots(bots, "onGameStart", {});
 };
@@ -22,4 +18,4 @@ async function sendMessageToBots(bots, callbackName, data) {
   bots.forEach(bot => bot.send({ callback: callbackName, data: data }));
 }
 
-module.exports = { onGameTick, onPlayerJoin, onPositionsReset, onTeamGoal, onGameStart };
+module.exports = { onGameTick, onPlayerJoin, onPositionsReset, onGameStart };
