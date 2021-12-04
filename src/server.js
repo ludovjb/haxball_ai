@@ -58,7 +58,9 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
         let playerName = "Bot_"+counter;
         const child = fork("./src/bot.js", [roomLink, playerName, i+1, actionFile, adminToken, roomPassword]);
         bots.push(child);
-        console.log(playerName + " has been created and forked");
+        if(verbose) {
+          console.log(playerName + " has been created and forked");
+        }
       });
     }
 
