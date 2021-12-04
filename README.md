@@ -26,7 +26,7 @@ optional arguments:
   ```
 
 - Launch the server with a token from [here](https://www.haxball.com/headlesstoken) :
-`node src/launcher {token}`
+`node src/launcher.js {token}`
 
 ## AI agents
 
