@@ -31,9 +31,10 @@ if (!bot.adminToken) {
 }
 
 const roomPassword = process.argv[7];
+let browser = null;
 
 async function run () {
-    const browser = await puppeteer.launch();
+    browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setViewport({ width: 2, height: 2 })
     await page.goto(url);
@@ -89,5 +90,13 @@ async function onServerMessage(message, page) {
     console.error("The following client callback function doesn't exist : "+message.callback);
   }
 }
+
+function cleanExit() {
+  browser.close();
+  console.log(bot.name+"'s' process exited.");
+  process.exit();
+};
+process.on('SIGINT', cleanExit); // catch ctrl-c
+process.on('SIGTERM', cleanExit); // catch kill
 
 run();

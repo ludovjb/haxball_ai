@@ -4,6 +4,7 @@ const conf = require('./config.js');
 const { createHaxballRoom } = require('./haxserver.js')
 const roomCallbacks = require('./server_callbacks.js')
 
+let browser = null;
 let bots = [];
 
 async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBotsPerTeam, redTeamActionFile, blueTeamActionFile, adminToken, vps, verbose) {
@@ -11,7 +12,7 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
     if(vps) {
       browserParams.args = ["--disable-features=WebRtcHideLocalIpsWithMdns"];
     }
-    const browser = await puppeteer.launch(browserParams);
+    browser = await puppeteer.launch(browserParams);
     const page = await browser.newPage();
 
     await page.setViewport({ width: 2, height: 2 })
@@ -98,5 +99,18 @@ function checkAIActionFile(fileName) {
   }
   return relativeFileName;
 }
+
+function cleanExit() {
+  browser.close();
+  bots.forEach(bot => {
+    bot.kill('SIGINT');
+  });
+  bots = [];
+  console.log("Server exited.")
+  process.exit();
+};
+process.on('SIGINT', cleanExit); // catch ctrl-c
+process.on('SIGTERM', cleanExit); // catch kill
+
 
 module.exports = { launchServer, checkPasswordValue, checkAIActionFile };
