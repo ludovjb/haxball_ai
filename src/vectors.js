@@ -19,6 +19,13 @@ function div(vec, denominator) {
    }
 }
 
+function mul(vec, factor) {
+  return {
+    x: vec.x * factor,
+    y: vec.y * factor
+   }
+}
+
 function normL2(vec) {
   return Math.sqrt(Math.pow(vec.x, 2) + Math.pow(vec.y, 2));
 }
@@ -52,4 +59,4 @@ function transformVectors(object, operation) {
   }
 }
 
-module.exports = { add, sub, div, normL2, angle, transformVectors };
+module.exports = { add, sub, div, mul, normL2, angle, transformVectors };
