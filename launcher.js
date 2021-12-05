@@ -1,6 +1,6 @@
 const { ArgumentParser } = require('argparse');
-const conf = require('./config.js');
-const { launchServer } = require('./server.js')
+const conf = require('./src/config.js');
+const { launchServer, checkPasswordValue, checkAIActionFile } = require('./src/server.js')
 
 const parser = new ArgumentParser();
 
@@ -21,22 +21,3 @@ if(args.verbose) {
 }
 
 launchServer(args.name, args.password, args.token, args.bots, args.redteam, args.blueteam, args.admin, args.vps, args.verbose);
-
-function checkPasswordValue(password) {
-  if(password.length > 30) {
-    console.error("Given password is too long (maxlength = 30). Default password ('"+conf.DEFAULT_PASSWORD+"') is set.");
-    return conf.DEFAULT_PASSWORD;
-  }
-  return password;
-}
-
-function checkAIActionFile(fileName) {
-  try {
-    const { action } = require(fileName);
-  } catch (error) {
-    console.error("An error has occured with the following action file : "+fileName);
-    console.error(error);
-    process.exit(1);
-  }
-  return fileName;
-}

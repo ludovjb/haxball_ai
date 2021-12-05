@@ -4,7 +4,7 @@
 `npm install`
 
 - Read the doc about optional args :
-`node src/launcher --help`
+`node launcher --help`
 
 ```
 usage: launcher.js [-h] [-n NAME] [-p PASSWORD] [-b BOTS] [--redteam REDTEAM] [--blueteam BLUETEAM] [--admin ADMIN] [-v] [--vps] token
@@ -26,11 +26,11 @@ optional arguments:
   ```
 
 - Launch the server with a token from [here](https://www.haxball.com/headlesstoken) :
-`node src/launcher.js {token}`
+`node launcher.js {token}`
 
 ## AI agents
 
-This project allows to build AI agents by defining the action function, in a single .js file. An example is given [here](src/simple_ai.js).
+This project allows to build AI agents by defining the action function, in a single .js file. An example is given [here](agents/simple_ai.js).
 
 ### Environment
 

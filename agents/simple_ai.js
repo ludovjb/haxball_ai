@@ -1,4 +1,4 @@
-const vec = require('./vectors.js');
+const vec = require('../src/vectors.js');
 
 function action(env) {
   let distanceWithBall = vec.normL2(env.ball.position);

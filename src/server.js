@@ -79,4 +79,24 @@ async function onRoomMessage(callback, data) {
   }
 }
 
-module.exports = { launchServer };
+function checkPasswordValue(password) {
+  if(password.length > 30) {
+    console.error("Given password is too long (maxlength = 30). Default password ('"+conf.DEFAULT_PASSWORD+"') is set.");
+    return conf.DEFAULT_PASSWORD;
+  }
+  return password;
+}
+
+function checkAIActionFile(fileName) {
+  const relativeFileName = "../"+fileName;
+  try {
+    const { action } = require(relativeFileName);
+  } catch (error) {
+    console.error("An error has occured with the following action file : "+relativeFileName);
+    console.error(error);
+    process.exit(1);
+  }
+  return relativeFileName;
+}
+
+module.exports = { launchServer, checkPasswordValue, checkAIActionFile };

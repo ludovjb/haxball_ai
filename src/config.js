@@ -1,7 +1,7 @@
 var crypto = require("crypto");
 
 const DEFAULT_PASSWORD = "!pss";
-const DEFAULT_AI_FILE = "./simple_ai.js"
+const DEFAULT_AI_FILE = "agents/simple_ai"
 const DEFAULT_ADMIN_TOKEN = crypto.randomBytes(10).toString('hex');
 const SPECTATORS = 0;
 const RED_TEAM = 1;
