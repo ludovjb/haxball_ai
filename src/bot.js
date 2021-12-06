@@ -1,43 +1,37 @@
 const puppeteer = require('puppeteer');
 const botCallbacks = require('./bot_callbacks.js');
+const { refreshActionFunction } = require('./bot_functions.js');
 const conf = require('./config.js');
 
-const url = process.argv[2];
-if (!url) {
-    throw "Please provide URL as a first argument";
+const botId = parseInt(process.argv[2]);
+if (!botId) {
+    throw "Please provide a bot name as a first argument";
+}
+
+const roomLink = process.argv[3];
+if (!roomLink) {
+    throw "Please provide URL as a second argument";
+}
+
+const adminToken = process.argv[4];
+if (!adminToken) {
+    throw "Please provide an admin token as a third argument";
 }
 
 const bot = {
-  name: process.argv[3],
-  team: parseInt(process.argv[4]),
-  actionFile: process.argv[5],
-  adminToken: process.argv[6],
+  id: botId,
+  name: "Bot_"+botId,
+  adminToken: adminToken
 };
 
-if (!bot.name) {
-    throw "Please provide a bot name as a third argument";
-}
-
-if (!bot.team) {
-    throw "Please provide a bot name as a fourth argument";
-}
-
-if (!bot.actionFile) {
-    throw "Please provide an action file as a fifth argument";
-}
-
-if (!bot.adminToken) {
-    throw "Please provide an admin token as a sixth argument";
-}
-
-const roomPassword = process.argv[7];
+const roomPassword = process.argv[5];
 let browser = null;
 
 async function run () {
     browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.setViewport({ width: 2, height: 2 })
-    await page.goto(url);
+    await page.goto(roomLink);
     await page.waitForSelector("iframe");
 
     var frames = await page.frames();
@@ -65,15 +59,14 @@ async function run () {
 
     await sendChat(page, "/avatar ai");
     await sendChat(page, "!admin "+bot.adminToken);
-    await sendChat(page, "!moveteam "+bot.adminToken+" "+bot.team);
+    await sendChat(page, "!bot "+bot.adminToken+" "+bot.id);
 
     process.on('message', (message) => onServerMessage(message, page));
 
     while(await myframe.$(".icon-menu")) {
       await page.waitForTimeout(10000);
     }
-    console.log("End of connection for "+bot.name);
-    browser.close();
+    cleanExit();
 }
 
 async function sendChat(page, message) {
@@ -93,7 +86,7 @@ async function onServerMessage(message, page) {
 
 function cleanExit() {
   browser.close();
-  console.log(bot.name+"'s' process exited.");
+  console.log(bot.name+"'s process exited.");
   process.exit();
 };
 process.on('SIGINT', cleanExit); // catch ctrl-c

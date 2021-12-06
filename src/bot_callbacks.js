@@ -1,11 +1,19 @@
 const conf = require('./config.js');
-const { applyAction, resetAllKeysExceptFor, getBotRelativeGameEnv } = require('./bot_functions.js')
+const { refreshActionFunction, applyAction, resetAllKeysExceptFor, getBotRelativeGameEnv } = require('./bot_functions.js')
 
 var lastTickData = null;
-var actionFunction = null;
 var delayBeforePlay = conf.MAX_DELAY_BEFORE_PLAY;
 
+async function onBotAuthentification(data, bot, page) {
+  bot.roomId = data.roomId;
+  console.log("The bot id "+bot.id+" is now authentificate as the bot roomId "+bot.roomId);
+}
+
 async function onGameTick(data, bot, page) {
+  if(!bot.roomId) {
+    return;
+  }
+
   if(!lastTickData || data.tick - lastTickData.tick > 1) {
     await resetAllKeysExceptFor(page);
     lastTickData = data;
@@ -19,7 +27,7 @@ async function onGameTick(data, bot, page) {
 
   var goalJustScored = lastTickData.scores.red != data.scores.red || lastTickData.scores.blue != data.scores.blue;
 
-  var environment = getBotRelativeGameEnv(lastTickData, data, bot.name);
+  var environment = getBotRelativeGameEnv(lastTickData, data, bot);
   if(!environment) {
     return; // the bot is not in the game
   }
@@ -46,11 +54,13 @@ async function onGameTick(data, bot, page) {
     delayBeforePlay = conf.MAX_DELAY_BEFORE_PLAY;
   }
 
-  if(!actionFunction) {
-    const { action } = require(bot.actionFile);
-    actionFunction = action;
+  var actionName;
+  try {
+    actionName = bot.actionFunction ? bot.actionFunction(environment) : "none";
+  } catch (error) {
+    console.error(error);
+    actionName = "none";
   }
-  var actionName = actionFunction(environment);
   applyAction(environment.bot.team, actionName, page);
 }
 
@@ -63,4 +73,11 @@ async function onGameStart(data, bot, page) {
   lastTickData = null;
 }
 
-module.exports = { onGameTick, onPositionsReset, onGameStart };
+async function onActionFileRefresh(data, bot, page) {
+  if(data.actionFile) {
+    bot.actionFile = data.actionFile;
+  }
+  refreshActionFunction(bot);
+}
+
+module.exports = { onBotAuthentification, onGameTick, onPositionsReset, onGameStart, onActionFileRefresh };

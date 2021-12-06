@@ -1,15 +1,17 @@
 const puppeteer = require('puppeteer');
-const { fork } = require('child_process');
 const conf = require('./config.js');
-const { createHaxballRoom } = require('./haxserver.js')
-const roomCallbacks = require('./server_callbacks.js')
+const { createHaxballRoom } = require('./haxserver.js');
+const roomCallbacks = require('./server_callbacks.js');
+const { createBot, sendMessageToAllBots } = require('./server_functions.js');
 
 let browser = null;
-let bots = [];
+let server = {};
 
-async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBotsPerTeam, redTeamActionFile, blueTeamActionFile, adminToken, vps, verbose) {
-    var browserParams = { dumpio: verbose };
-    if(vps) {
+async function launchServer(args) {
+    Object.assign(server, args);
+
+    var browserParams = { dumpio: server.verbose };
+    if(server.vps) {
       browserParams.args = ["--disable-features=WebRtcHideLocalIpsWithMdns"];
     }
     browser = await puppeteer.launch(browserParams);
@@ -25,7 +27,7 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
 
     await page.exposeFunction("messageToServer", onRoomMessage);
 
-    page.evaluate(createHaxballRoom, roomName, roomPassword, recaptchaToken, adminToken);
+    page.evaluate(createHaxballRoom, server.name, server.password, server.token, server.admin);
 
     const selectorRoomLink = "#roomlink p a";
     try {
@@ -36,33 +38,30 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
         return;
     }
 
-    const roomLink = await gameFrame.evaluate((selectorRoomLink) => document.querySelector(selectorRoomLink).innerText, selectorRoomLink);
+    server.roomLink = await gameFrame.evaluate((selectorRoomLink) => document.querySelector(selectorRoomLink).innerText, selectorRoomLink);
 
-    if(!vps) {
+    if(!server.vps) {
       const open = require('open');
-      open(roomLink);
+      open(server.roomLink);
     }
 
     console.log("**************************************************")
     console.log("The room link is :");
     console.log("");
-    console.log(roomLink);
+    console.log(server.roomLink);
     console.log("")
-    console.log("The room password is : "+args.password);
-    console.log("The admin token is : "+args.admin);
+    console.log("The room password is : " + server.password);
+    console.log("The admin token is : " + server.admin);
     console.log("**************************************************")
 
-    var counter=0;
-    for(let p = 0; p < numberOfBotsPerTeam; p++) {
-      [redTeamActionFile, blueTeamActionFile].forEach((actionFile, i) => {
-        counter += 1;
-        let playerName = "Bot_"+counter;
-        const child = fork("./src/bot.js", [roomLink, playerName, i+1, actionFile, adminToken, roomPassword]);
-        bots.push(child);
-        if(verbose) {
-          console.log(playerName + " has been created and forked");
-        }
-      });
+    server.numberOfBots = server.bots * 2;
+    server.bots = {};
+    for(let p = 0; p < server.numberOfBots; p++) {
+      createBot(server);
+    }
+
+    if(server.nocache) {
+      setInterval(() => sendMessageToAllBots(server.bots, "onActionFileRefresh", { actionFile: server.redteam }), 1500);
     }
 
     while(true) {
@@ -73,39 +72,18 @@ async function launchServer(roomName, roomPassword, recaptchaToken, numberOfBots
 
 async function onRoomMessage(callback, data) {
   if(callback in roomCallbacks && typeof roomCallbacks[callback] === "function") {
-    roomCallbacks[callback](data, bots);
+    roomCallbacks[callback](data, server);
   }
   else {
     console.error("The following server callback function doesn't exist : "+callback);
   }
 }
 
-function checkPasswordValue(password) {
-  if(password.length > 30) {
-    console.error("Given password is too long (maxlength = 30). Default password ('"+conf.DEFAULT_PASSWORD+"') is set.");
-    return conf.DEFAULT_PASSWORD;
-  }
-  return password;
-}
-
-function checkAIActionFile(fileName) {
-  const relativeFileName = "../"+fileName;
-  try {
-    const { action } = require(relativeFileName);
-  } catch (error) {
-    console.error("An error has occured with the following action file : "+relativeFileName);
-    console.error(error);
-    process.exit(1);
-  }
-  return relativeFileName;
-}
-
 function cleanExit() {
   browser.close();
-  bots.forEach(bot => {
+  Object.values(server.bots).forEach(bot => {
     bot.kill('SIGINT');
   });
-  bots = [];
   console.log("Server exited.")
   process.exit();
 };
@@ -113,4 +91,4 @@ process.on('SIGINT', cleanExit); // catch ctrl-c
 process.on('SIGTERM', cleanExit); // catch kill
 
 
-module.exports = { launchServer, checkPasswordValue, checkAIActionFile };
+module.exports = { launchServer };

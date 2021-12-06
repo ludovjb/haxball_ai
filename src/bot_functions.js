@@ -1,8 +1,26 @@
+const decache = require('decache');
 const conf = require('./config.js');
-var vec = require('./vectors.js')
+var vec = require('./vectors.js');
 
 
 const keyHold = {};
+
+function refreshActionFunction(bot) {
+  if(!bot.actionFile) {
+    return;
+  }
+  
+  decache(bot.actionFile);
+
+  try {
+    const { action } = require(bot.actionFile);
+    bot.actionFunction = action;
+  }
+  catch(error) {
+    console.error(error);
+    bot.actionFunction = null;
+  }
+}
 
 async function applyAction(team, actionName, page) {
   if(team != conf.RED_TEAM && team != conf.BLUE_TEAM) {
@@ -101,8 +119,8 @@ function computePlayerVelocity(playerId, lastData, currentData) {
   return playerVelocity = { x: 0, y: 0 };
 }
 
-function getBotRelativeGameEnv(lastData, currentData, botName) {
-  var localPlayer = Object.values(currentData.players).find((player) => player.name == botName);
+function getBotRelativeGameEnv(lastData, currentData, bot) {
+  var localPlayer = Object.values(currentData.players).find((player) => player.id == bot.roomId);
   if(!localPlayer || !localPlayer.position) {
     return null;
   }
@@ -169,4 +187,4 @@ function getBotRelativeGameEnv(lastData, currentData, botName) {
   return relativeEnv;
 }
 
-module.exports = { applyAction, resetAllKeysExceptFor, getBotRelativeGameEnv }
+module.exports = { refreshActionFunction, applyAction, resetAllKeysExceptFor, getBotRelativeGameEnv }
