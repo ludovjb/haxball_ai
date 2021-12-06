@@ -58,7 +58,6 @@ async function run () {
     await myframe.waitForSelector(".icon-menu", {timeout: (999999999)});
 
     await sendChat(page, "/avatar ai");
-    await sendChat(page, "!admin "+bot.adminToken);
     await sendChat(page, "!bot "+bot.adminToken+" "+bot.id);
 
     process.on('message', (message) => onServerMessage(message, page));
