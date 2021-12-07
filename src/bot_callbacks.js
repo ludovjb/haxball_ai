@@ -20,11 +20,6 @@ async function onGameTick(data, bot, page) {
     return;
   }
 
-  if(data.tick <= lastTickData.tick) {
-    console.error("Late data tick for "+bot.name+" : "+data.tick +" <= "+ lastTickData.tick);
-    return;
-  }
-
   var goalJustScored = lastTickData.scores.red != data.scores.red || lastTickData.scores.blue != data.scores.blue;
 
   var environment = getBotRelativeGameEnv(lastTickData, data, bot);
