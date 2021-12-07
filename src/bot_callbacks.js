@@ -14,7 +14,7 @@ async function onGameTick(data, bot, page) {
     return;
   }
 
-  if(!lastTickData || data.tick - lastTickData.tick > 1) {
+  if(!lastTickData || data.tick - lastTickData.tick > 1 || data.gameEnded) {
     await resetAllKeysExceptFor(page);
     lastTickData = data;
     return;

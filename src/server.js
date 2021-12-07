@@ -27,7 +27,7 @@ async function launchServer(args) {
 
     await page.exposeFunction("messageToServer", onRoomMessage);
 
-    page.evaluate(createHaxballRoom, server.name, server.password, server.token, server.admin);
+    page.evaluate(createHaxballRoom, server.name, server.password, server.token, server.admin, server.bots);
 
     const selectorRoomLink = "#roomlink p a";
     try {
