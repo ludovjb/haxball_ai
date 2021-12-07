@@ -20,7 +20,7 @@ if (!adminToken) {
 
 const bot = {
   id: botId,
-  name: "Bot_"+botId,
+  name: "bot-"+botId,
   adminToken: adminToken
 };
 
