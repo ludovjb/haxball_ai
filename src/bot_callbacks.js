@@ -20,12 +20,12 @@ async function onGameTick(data, bot, page) {
     return;
   }
 
-  var goalJustScored = lastTickData.scores.red != data.scores.red || lastTickData.scores.blue != data.scores.blue;
-
   var environment = getBotRelativeGameEnv(lastTickData, data, bot);
   if(!environment) {
     return; // the bot is not in the game
   }
+
+  var goalJustScored = lastTickData.scores.red != data.scores.red || lastTickData.scores.blue != data.scores.blue;
   lastTickData = data;
 
   if(delayBeforePlay > 0) {
