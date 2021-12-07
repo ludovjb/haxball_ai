@@ -9,7 +9,6 @@ function refreshActionFunction(bot) {
   if(!bot.actionFile) {
     return;
   }
-  
   decache(bot.actionFile);
 
   try {
@@ -119,7 +118,10 @@ function computePlayerVelocity(playerId, lastData, currentData) {
   return playerVelocity = { x: 0, y: 0 };
 }
 
-function getBotRelativeGameEnv(lastData, currentData, bot) {
+function getBotRelativeGameEnv(dataHistory, bot) {
+  var lastTickNumber = Math.max(...Object.keys(dataHistory));
+  var currentData = dataHistory[lastTickNumber];
+  var lastData = dataHistory[lastTickNumber - 1];
   var localPlayer = Object.values(currentData.players).find((player) => player.id == bot.roomId);
   if(!localPlayer || !localPlayer.position) {
     return null;

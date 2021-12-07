@@ -1,7 +1,7 @@
 const conf = require('./config.js');
 const { refreshActionFunction, applyAction, resetAllKeysExceptFor, getBotRelativeGameEnv } = require('./bot_functions.js')
 
-var lastTickData = null;
+var dataHistory = {};
 var delayBeforePlay = conf.MAX_DELAY_BEFORE_PLAY;
 
 async function onBotAuthentification(data, bot, page) {
@@ -10,23 +10,25 @@ async function onBotAuthentification(data, bot, page) {
 }
 
 async function onGameTick(data, bot, page) {
-  if(!bot.roomId) {
+  if(!bot.roomId || data.gameEnded) {
     return;
   }
 
-  if(!lastTickData || data.tick - lastTickData.tick > 1 || data.gameEnded) {
-    await resetAllKeysExceptFor(page);
-    lastTickData = data;
+  dataHistory[data.tick] = data;
+  if(!(data.tick - 1 in dataHistory) || !(data.tick - 2 in dataHistory)) {
     return;
   }
+  else {
+    Object.keys(dataHistory).filter(tick => tick < data.tick - 2).forEach(tick => delete dataHistory[tick]);
+  }
 
-  var environment = getBotRelativeGameEnv(lastTickData, data, bot);
+  var environment = getBotRelativeGameEnv(dataHistory, bot);
   if(!environment) {
     return; // the bot is not in the game
   }
 
-  var goalJustScored = lastTickData.scores.red != data.scores.red || lastTickData.scores.blue != data.scores.blue;
-  lastTickData = data;
+  var lastData = dataHistory[data.tick - 1];
+  var goalJustScored = lastData.scores.red != data.scores.red || lastData.scores.blue != data.scores.blue;
 
   if(delayBeforePlay > 0) {
     await resetAllKeysExceptFor(page);
