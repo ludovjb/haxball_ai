@@ -32,7 +32,6 @@ function action(env) {
   else /*if(approxEquals(angle, -45))*/ {
     return "forward-right";
   }
-  return "none";
 }
 
 function approxEquals(v1, v2) {
