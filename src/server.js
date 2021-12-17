@@ -60,8 +60,12 @@ async function launchServer(args) {
       createBot(server);
     }
 
+    var actionFileSettingOperation = () => sendMessageToAllBots(server.bots, "onActionFileRefresh", { actionFile: server.redteam });
     if(server.nocache) {
-      setInterval(() => sendMessageToAllBots(server.bots, "onActionFileRefresh", { actionFile: server.redteam }), 1500);
+      setInterval(actionFileSettingOperation, 1500);
+    }
+    else {
+      setInterval(actionFileSettingOperation, 5000);
     }
 
     while(true) {
