@@ -185,7 +185,7 @@ async function createHaxballRoom(serverName, password, recaptchaToken, adminToke
   }
 
   function sendHelpMessage(room, player) {
-    room.sendAnnouncement("This room allows to play 1v1 games againt the computer.", player.id, "0xFFFB00");
+    room.sendAnnouncement("This room allows to play 1v1 games against the computer.", player.id, "0xFFFB00");
     room.sendAnnouncement("AI bots are very bad at playing HaxBall for the moment but they will be better soon (hope so!).", player.id, "0xFFFB00");
     room.sendAnnouncement(" - If you are developer, have a look at the GitHub project here : github.com/ludovjb/haxball_ai", player.id, "0xFFFB00");
     room.sendAnnouncement(" - You will be able to make you own AI scripts soon.", player.id, "0xFFFB00");
