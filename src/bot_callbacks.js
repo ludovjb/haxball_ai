@@ -11,6 +11,8 @@ async function onBotAuthentification(data, bot, page) {
 
 async function onGameTick(data, bot, page) {
   if(!bot.roomId || data.gameEnded) {
+    dataHistory = {};
+    await resetAllKeysExceptFor(page);
     return;
   }
 
