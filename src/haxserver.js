@@ -1,8 +1,8 @@
 
 async function createHaxballRoom(serverName, password, recaptchaToken, adminToken, numberOfPlayersPerTeam) {
-  if(numberOfPlayersPerTeam <= 0) {
-    throw "numberOfPlayersPerTeam must be greather than 0";
-  }
+  // if(numberOfPlayersPerTeam <= 0) {
+  //   throw "numberOfPlayersPerTeam must be greather than 0";
+  // }
   const teamNames = ["Spectators", "Red team", "Blue team"];
   var tickNumber = 0;
   var announceNoOvertime = false;

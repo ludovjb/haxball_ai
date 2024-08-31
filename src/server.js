@@ -3,6 +3,7 @@ const conf = require('./config.js');
 const { createHaxballRoom } = require('./haxserver.js');
 const roomCallbacks = require('./server_callbacks.js');
 const { createBot, sendMessageToAllBots } = require('./server_functions.js');
+const promises = require("node:timers/promises");
 
 let browser = null;
 let server = {};
@@ -69,7 +70,7 @@ async function launchServer(args) {
     }
 
     while(true) {
-      await page.waitForTimeout(3000);
+      await promises.setTimeout(3000);
     }
     browser.close();
 }
