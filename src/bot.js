@@ -32,7 +32,7 @@ let browser = null;
 async function run () {
     console.log(`Bot ${botId} is coming...`)
 
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch({args: ["--no-sandbox"]});
     const page = await browser.newPage();
 
     await page.goto(roomLink);

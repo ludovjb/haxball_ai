@@ -11,9 +11,9 @@ let server = {};
 async function launchServer(args) {
     Object.assign(server, args);
 
-    var browserParams = { dumpio: server.verbose };
+    var browserParams = { dumpio: server.verbose, args: ["--no-sandbox"] };
     if(server.vps) {
-      browserParams.args = ["--disable-features=WebRtcHideLocalIpsWithMdns"];
+      browserParams.args.push(["--disable-features=WebRtcHideLocalIpsWithMdns"]);
     }
     browser = await puppeteer.launch(browserParams);
     const page = await browser.newPage();
