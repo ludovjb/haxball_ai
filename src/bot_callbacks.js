@@ -1,15 +1,15 @@
-const conf = require('./config.js');
-const { refreshActionFunction, applyAction, resetAllKeysExceptFor, getBotRelativeGameEnv } = require('./bot_functions.js')
+import * as conf from './config.js';
+import { refreshActionFunction, applyAction, resetAllKeysExceptFor, getBotRelativeGameEnv } from './bot_functions.js'
 
 var dataHistory = {};
 var delayBeforePlay = conf.MAX_DELAY_BEFORE_PLAY;
 
-async function onBotAuthentification(data, bot, page) {
+export async function onBotAuthentification(data, bot, _page) {
   bot.roomId = data.roomId;
   console.log("The bot id "+bot.id+" is now authentificate as the bot roomId "+bot.roomId);
 }
 
-async function onGameTick(data, bot, page) {
+export async function onGameTick(data, bot, page) {
   if(!bot.roomId || data.gameEnded) {
     dataHistory = {};
     await resetAllKeysExceptFor(page);
@@ -63,20 +63,17 @@ async function onGameTick(data, bot, page) {
   applyAction(environment.bot.team, actionName, page);
 }
 
-async function onPositionsReset(data, bot, page) {
+export async function onPositionsReset(_data, _bot, _page) {
   delayBeforePlay = conf.DELAY_BEFORE_PLAY;
 }
 
-async function onGameStart(data, bot, page) {
+export async function onGameStart(_data, _bot, _page) {
   delayBeforePlay = conf.DELAY_BEFORE_PLAY;
-  lastTickData = null;
 }
 
-async function onActionFileRefresh(data, bot, page) {
+export async function onActionFileRefresh(data, bot, _page) {
   if(data.actionFile) {
     bot.actionFile = data.actionFile;
   }
   refreshActionFunction(bot);
 }
-
-module.exports = { onBotAuthentification, onGameTick, onPositionsReset, onGameStart, onActionFileRefresh };

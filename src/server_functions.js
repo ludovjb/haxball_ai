@@ -1,6 +1,7 @@
-const { fork } = require('child_process');
+import { fork } from 'child_process';
+import * as conf from './config.js';
 
-function checkPasswordValue(password) {
+export function checkPasswordValue(password) {
   if(password.length > 30) {
     console.error("Given password is too long (maxlength = 30). Default password ('"+conf.DEFAULT_PASSWORD+"') is set.");
     return conf.DEFAULT_PASSWORD;
@@ -8,20 +9,25 @@ function checkPasswordValue(password) {
   return password;
 }
 
-function checkAIActionFile(fileName) {
-  const relativeFileName = "../"+fileName;
+
+export async function checkAIActionFile(fileName) {
+  const relativeFileName = "../" + fileName + ".js";
+
+
+
   try {
-    const { action } = require(relativeFileName);
+    await import(relativeFileName);
   } catch (error) {
-    console.error("An error has occured with the following action file : "+relativeFileName);
-    console.error(error);
+    console.error("An error has occurred with the following action file: " + relativeFileName);
+    console.error("ERROR " + error);
     process.exit(1);
   }
+
   return relativeFileName;
 }
 
 var counterBots = 0;
-function createBot(server) {
+export function createBot(server) {
   var botId = ++counterBots;
   const child = fork("./src/bot.js", [botId, server.roomLink, server.admin, server.password]);
   server.bots[botId] = child;
@@ -31,12 +37,11 @@ function createBot(server) {
   return botId;
 }
 
-async function sendMessageToAllBots(bots, callbackName, data) {
+export async function sendMessageToAllBots(bots, callbackName, data) {
   Object.values(bots).forEach(async bot => bot.send({ callback: callbackName, data: data }));
 }
 
-async function sendMessageToBot(bot, callbackName, data) {
+export async function sendMessageToBot(bot, callbackName, data) {
   bot.send({ callback: callbackName, data: data });
 }
 
-module.exports = { checkPasswordValue, checkAIActionFile, createBot, sendMessageToAllBots, sendMessageToBot };

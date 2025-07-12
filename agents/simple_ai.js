@@ -1,6 +1,6 @@
-const vec = require('../src/vectors.js');
+import * as vec from '../src/vectors.js';
 
-function action(env) {
+export function action(env) {
   let distanceWithBall = vec.normL2(env.ball.position);
   if(distanceWithBall < 25.5) {
     return "kick";
@@ -37,5 +37,3 @@ function action(env) {
 function approxEquals(v1, v2) {
   return Math.abs(v1-v2) <= 22.5;
 }
-
-module.exports = { action };

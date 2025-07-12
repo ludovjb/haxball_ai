@@ -1,14 +1,15 @@
-const puppeteer = require('puppeteer');
-const conf = require('./config.js');
-const { createHaxballRoom } = require('./haxserver.js');
-const roomCallbacks = require('./server_callbacks.js');
-const { createBot, sendMessageToAllBots } = require('./server_functions.js');
-const promises = require("node:timers/promises");
+import puppeteer from 'puppeteer';
+import { createHaxballRoom } from './haxserver.browser.js';
+import * as roomCallbacks  from './server_callbacks.js';
+import * as browserFunctions  from './functions.browser.js'
+import { createBot, sendMessageToAllBots }  from './server_functions.js';
+import promises  from "node:timers/promises";
+import open from 'open';
 
 let browser = null;
-let server = {};
+let server = {};
 
-async function launchServer(args) {
+export async function launchServer(args) {
     Object.assign(server, args);
 
     var browserParams = { dumpio: server.verbose, args: ["--no-sandbox"] };
@@ -33,16 +34,15 @@ async function launchServer(args) {
     const selectorRoomLink = "#roomlink p a";
     try {
       await gameFrame.waitForSelector(selectorRoomLink, {timeout: 3000});
-    } catch (e) {
+    } catch {
         console.log("Invalid token ! ");
         browser.close();
         return;
     }
 
-    server.roomLink = await gameFrame.evaluate((selectorRoomLink) => document.querySelector(selectorRoomLink).innerText, selectorRoomLink);
+    server.roomLink = await gameFrame.evaluate(browserFunctions.getRoomLink, selectorRoomLink);
 
     if(!server.vps) {
-      const open = require('open');
       open(server.roomLink);
     }
 
@@ -73,7 +73,6 @@ async function launchServer(args) {
     while(true) {
       await promises.setTimeout(3000);
     }
-    browser.close();
 }
 
 async function onRoomMessage(callback, data) {
@@ -95,6 +94,3 @@ function cleanExit() {
 };
 process.on('SIGINT', cleanExit); // catch ctrl-c
 process.on('SIGTERM', cleanExit); // catch kill
-
-
-module.exports = { launchServer };

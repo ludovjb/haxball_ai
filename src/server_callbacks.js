@@ -1,14 +1,14 @@
-const { createBot, sendMessageToBot, sendMessageToAllBots } = require('./server_functions.js');
+import { createBot, sendMessageToBot, sendMessageToAllBots } from './server_functions.js';
 
-async function onGameTick(data, server) {
+export async function onGameTick(data, server) {
     sendMessageToAllBots(server.bots, "onGameTick", data);
 };
 
-async function onPlayerJoin(data, server) {
+export async function onPlayerJoin(data, _server) {
   console.log(data + " has joined the room");
 };
 
-async function onPlayerLeave(data, server) {
+export async function onPlayerLeave(data, server) {
   if(data.botId) {
     if(data.botId in server.bots) {
       delete server.bots[data.botId];
@@ -24,20 +24,18 @@ async function onPlayerLeave(data, server) {
   }
 };
 
-async function onPositionsReset(data, server) {
+export async function onPositionsReset(_data, server) {
   sendMessageToAllBots(server.bots, "onPositionsReset", {});
 };
 
-async function onGameStart(data, server) {
+export async function onGameStart(data, server) {
   sendMessageToAllBots(server.bots, "onGameStart", {});
 };
 
-async function onBotAuthentification(data, server) {
+export async function onBotAuthentification(data, server) {
   if(!server.bots[data.botId]) {
     console.error("The bot id "+data.botId+" doesn't exist in the server");
     return;
   }
   sendMessageToBot(server.bots[data.botId], "onBotAuthentification", data);
 };
-
-module.exports = { onGameTick, onPlayerJoin, onPlayerLeave, onPositionsReset, onGameStart, onBotAuthentification };

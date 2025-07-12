@@ -1,9 +1,4 @@
-
-async function createHaxballRoom(serverName, password, recaptchaToken, adminToken, numberOfPlayersPerTeam) {
-  // if(numberOfPlayersPerTeam <= 0) {
-  //   throw "numberOfPlayersPerTeam must be greather than 0";
-  // }
-  const teamNames = ["Spectators", "Red team", "Blue team"];
+export async function createHaxballRoom(serverName, password, recaptchaToken, adminToken, numberOfPlayersPerTeam) {
   var tickNumber = 0;
   var announceNoOvertime = false;
   var gameEnded = false;
@@ -111,7 +106,7 @@ async function createHaxballRoom(serverName, password, recaptchaToken, adminToke
     window.messageToServer("onPositionsReset", {});
   }
 
-  room.onGameStart = function(byPlayer) {
+  room.onGameStart = function(_byPlayer) {
     tickNumber = 0;
     var dateNow = Date.now();
     window.messageToServer("onGameStart", {});
@@ -232,7 +227,7 @@ async function createHaxballRoom(serverName, password, recaptchaToken, adminToke
     return room.getPlayerList().filter(player => room.players[player.id] && room.players[player.id].bot == isBot);
   }
 
-  function isGameReadyToPlay(room, str="") {
+  function isGameReadyToPlay(room) {
     var redPlayersNumber = getPlayersInTeam(room, 1).length;
     var bluePlayersNumber = getPlayersInTeam(room, 2).length;
     return !room.getScores() && redPlayersNumber == bluePlayersNumber;
@@ -248,7 +243,6 @@ async function createHaxballRoom(serverName, password, recaptchaToken, adminToke
       getPlayersInTeam(room, 1).forEach(player => room.setPlayerTeam(player.id, 0));
     }
 
-    var bluePlayers = getPlayersInTeam(room, 2);
     var bots = getPlayers(room, true);
     var availableBots = getPlayersInTeam(room, 0, bots).concat(getPlayersInTeam(room, 1, bots));
     if(getPlayersInTeam(room, 2).length < numberOfPlayersPerTeam && availableBots.length > 0) {
@@ -300,6 +294,3 @@ async function createHaxballRoom(serverName, password, recaptchaToken, adminToke
   setInterval(noActivityCheck, 2000, room);
   return room;
 }
-
-
-module.exports = { createHaxballRoom };

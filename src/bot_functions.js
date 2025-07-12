@@ -1,18 +1,18 @@
-const decache = require('decache');
-const conf = require('./config.js');
-var vec = require('./vectors.js');
+import decache from 'decache';
+import * as conf from './config.js';
+import * as vec from './vectors.js';
 
 
 const keyHold = {};
 
-function refreshActionFunction(bot) {
+export function refreshActionFunction(bot) {
   if(!bot.actionFile) {
     return;
   }
   decache(bot.actionFile);
 
   try {
-    const { action } = require(bot.actionFile);
+    const { action } = import(bot.actionFile);
     bot.actionFunction = action;
   }
   catch(error) {
@@ -21,7 +21,7 @@ function refreshActionFunction(bot) {
   }
 }
 
-async function applyAction(team, actionName, page) {
+export async function applyAction(team, actionName, page) {
   if(team != conf.RED_TEAM && team != conf.BLUE_TEAM) {
     await resetAllKeysExceptFor(page);
     return;
@@ -89,9 +89,9 @@ function getOppositeCommand(commandKey) {
   }
 }
 
-async function pressKeys(page, ...commandKeys) {
+ async function pressKeys(page, ...commandKeys) {
   await resetAllKeysExceptFor(page, ...commandKeys);
-  commandKeys.forEach(async (commandKey, i) => {
+  commandKeys.forEach(async (commandKey, _i) => {
     if(!(commandKey in keyHold) || !keyHold[commandKey]) {
       await page.keyboard.down(commandKey);
       keyHold[commandKey] = true;
@@ -99,8 +99,8 @@ async function pressKeys(page, ...commandKeys) {
   });
 }
 
-async function resetAllKeysExceptFor(page, ...exceptions) {
-  Object.keys(keyHold).forEach(async (commandKey, i) => {
+export async function resetAllKeysExceptFor(page, ...exceptions) {
+  Object.keys(keyHold).forEach(async (commandKey, _i) => {
     if(keyHold[commandKey] && !exceptions.includes(commandKey)) {
       await page.keyboard.up(commandKey);
       keyHold[commandKey] = false;
@@ -115,10 +115,10 @@ function computePlayerVelocity(playerId, lastData, currentData) {
     var curPlayerPosition = currentData.players[playerId].position;
     return vec.div(vec.sub(curPlayerPosition, lastPlayerPosition), currentData.tick - lastData.tick);
   }
-  return playerVelocity = { x: 0, y: 0 };
+  return { x: 0, y: 0 };
 }
 
-function getBotRelativeGameEnv(dataHistory, bot) {
+export function getBotRelativeGameEnv(dataHistory, bot) {
   var lastTickNumber = Math.max(...Object.keys(dataHistory));
   var currentData = dataHistory[lastTickNumber];
   var lastData = dataHistory[lastTickNumber - 1];
@@ -188,5 +188,3 @@ function getBotRelativeGameEnv(dataHistory, bot) {
   }
   return relativeEnv;
 }
-
-module.exports = { refreshActionFunction, applyAction, resetAllKeysExceptFor, getBotRelativeGameEnv }

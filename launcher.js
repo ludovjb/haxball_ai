@@ -1,7 +1,7 @@
-const { ArgumentParser } = require('argparse');
-const conf = require('./src/config.js');
-const { launchServer } = require('./src/server.js');
-const { checkPasswordValue, checkAIActionFile } = require('./src/server_functions.js')
+import { ArgumentParser } from 'argparse';
+import * as conf from './src/config.js';
+import { launchServer } from './src/server.js';
+import { checkPasswordValue, checkAIActionFile } from './src/server_functions.js';
 
 const parser = new ArgumentParser();
 
@@ -16,7 +16,7 @@ parser.add_argument('-v', '--verbose', { help: 'Verbose flag', action: 'store_tr
 parser.add_argument('--vps', { help: 'If the server will be running on a VPS', action: 'store_true' });
 parser.add_argument('--nocache', { help: 'If you want to reload agent file every second (for dev purposes)', action: 'store_true' });
 
-args = parser.parse_args();
+const args = parser.parse_args();
 
 if(args.verbose) {
   console.dir(args);

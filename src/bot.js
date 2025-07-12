@@ -1,8 +1,6 @@
-const puppeteer = require('puppeteer');
-const botCallbacks = require('./bot_callbacks.js');
-const { refreshActionFunction } = require('./bot_functions.js');
-const conf = require('./config.js');
-const promises = require("node:timers/promises");
+import puppeteer from 'puppeteer';
+import * as botCallbacks from './bot_callbacks.js';
+import * as promises from "node:timers/promises";
 
 
 const botId = parseInt(process.argv[2]);
