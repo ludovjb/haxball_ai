@@ -3,7 +3,7 @@ services:
     build:
       context: ./master
       target: prod
-      dockerfile: Dockerfile
+      dockerfile: master/Dockerfile
     volumes:
       - ./master/:/app 
       - /app/node_modules  # ignores node_modules local to avoid conflits
