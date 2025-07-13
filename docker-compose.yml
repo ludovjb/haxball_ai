@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: .
+      target: prod
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app 
+      - /app/node_modules  # ignores node_modules local to avoid conflits
+    command: node launcher.js "${HEADLESS_TOKEN}"]
+    environment:
+      HEADLESS_TOKEN: ${HEADLESS_TOKEN}

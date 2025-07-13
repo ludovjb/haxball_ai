@@ -35,7 +35,7 @@ export async function launchServer(args) {
     try {
       await gameFrame.waitForSelector(selectorRoomLink, {timeout: 3000});
     } catch {
-        console.log("Invalid token ! ");
+        console.log("Invalid token ! "+args);
         browser.close();
         return;
     }
@@ -85,6 +85,7 @@ async function onRoomMessage(callback, data) {
 }
 
 function cleanExit() {
+  a = 2
   browser.close();
   Object.values(server.bots).forEach(bot => {
     bot.kill('SIGINT');
