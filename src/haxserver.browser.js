@@ -1,4 +1,10 @@
-export async function createHaxballRoom(serverName, password, recaptchaToken, adminToken, numberOfPlayersPerTeam) {
+export async function createHaxballRoom(
+  serverName,
+  password,
+  recaptchaToken,
+  adminToken,
+  numberOfPlayersPerTeam,
+) {
   var tickNumber = 0;
   var announceNoOvertime = false;
   var gameEnded = false;
@@ -11,7 +17,7 @@ export async function createHaxballRoom(serverName, password, recaptchaToken, ad
     maxPlayers: 16,
     noPlayer: true,
     public: false,
-    token: recaptchaToken
+    token: recaptchaToken,
   });
   room.players = {};
 
@@ -19,45 +25,52 @@ export async function createHaxballRoom(serverName, password, recaptchaToken, ad
   room.setScoreLimit(3);
   room.setDefaultStadium("Classic");
 
-  room.onPlayerJoin = async function(player) {
+  room.onPlayerJoin = async function (player) {
     room.players[player.id] = {
       bot: false,
-      lastActivityTime: 0
-    }
+      lastActivityTime: 0,
+    };
 
     window.messageToServer("onPlayerJoin", player.name);
 
-    room.sendAnnouncement("Welcome to "+serverName+", "+player.name+" !", player.id, "0xFFFB00", "bold");
+    room.sendAnnouncement(
+      "Welcome to " + serverName + ", " + player.name + " !",
+      player.id,
+      "0xFFFB00",
+      "bold",
+    );
 
     wait(2000);
-    if(!updateTeamsInProgress) {
+    if (!updateTeamsInProgress) {
       updateTeams(room);
     }
 
-    if(!room.players[player.id].bot) {
+    if (!room.players[player.id].bot) {
       sendHelpMessage(room, player);
     }
-  }
+  };
 
-  room.onPlayerLeave = function(player) {
-    if(room.players[player.id].bot) {
+  room.onPlayerLeave = function (player) {
+    if (room.players[player.id].bot) {
       var botId = room.players[player.id].botId;
       delete room.players[player.id];
-      window.messageToServer("onPlayerLeave", { botId: botId, roomId: player.id });
-    }
-    else {
+      window.messageToServer("onPlayerLeave", {
+        botId: botId,
+        roomId: player.id,
+      });
+    } else {
       window.messageToServer("onPlayerLeave", player.name);
     }
     var scores = room.getScores();
-    if(scores && player.team != 0) {
+    if (scores && player.team != 0) {
       room.pauseGame(true);
       interruptGame(room, scores);
     }
-  }
+  };
 
-  room.onGameTick = function() {
+  room.onGameTick = function () {
     var scores = room.getScores();
-    if(!scores) {
+    if (!scores) {
       return;
     }
 
@@ -74,138 +87,175 @@ export async function createHaxballRoom(serverName, password, recaptchaToken, ad
     data.gameEnded = gameEnded;
     window.messageToServer("onGameTick", data);
 
-    if(data.ball.x == 0 && data.ball.y == 0) {
+    if (data.ball.x == 0 && data.ball.y == 0) {
       kickOffDuration++;
-    }
-    else if(kickOffDuration > 0){
+    } else if (kickOffDuration > 0) {
       kickOffDuration = 0;
     }
 
-    if(gameEnded) {
+    if (gameEnded) {
       return;
     }
 
-    if(data.scores.timeLimit > 0) {
-      if(!announceNoOvertime && data.scores.time > data.scores.timeLimit - 31) {
-        room.sendAnnouncement("No overtime ! 30 seconds to go...", null, "0xFFFB00");
+    if (data.scores.timeLimit > 0) {
+      if (
+        !announceNoOvertime &&
+        data.scores.time > data.scores.timeLimit - 31
+      ) {
+        room.sendAnnouncement(
+          "No overtime ! 30 seconds to go...",
+          null,
+          "0xFFFB00",
+        );
         announceNoOvertime = true;
-      }
-      else if(data.scores.time > data.scores.timeLimit) {
+      } else if (data.scores.time > data.scores.timeLimit) {
         room.pauseGame(true);
         interruptGame(room, data.scores);
       }
     }
-    if(data.scores.scoreLimit > 0) {
-      if(data.scores.red == data.scores.scoreLimit || data.scores.blue == data.scores.scoreLimit) {
+    if (data.scores.scoreLimit > 0) {
+      if (
+        data.scores.red == data.scores.scoreLimit ||
+        data.scores.blue == data.scores.scoreLimit
+      ) {
         interruptGame(room, data.scores);
       }
     }
-  }
+  };
 
-  room.onPositionsReset = function() {
+  room.onPositionsReset = function () {
     window.messageToServer("onPositionsReset", {});
-  }
+  };
 
-  room.onGameStart = function(_byPlayer) {
+  room.onGameStart = function (_byPlayer) {
     tickNumber = 0;
     var dateNow = Date.now();
     window.messageToServer("onGameStart", {});
-    room.getPlayerList().forEach(player => {
+    room.getPlayerList().forEach((player) => {
       room.players[player.id].lastActivityTime = dateNow;
     });
     announceNoOvertime = false;
     gameEnded = false;
     updateTeamsInProgress = false;
     kickOffDuration = 0;
-  }
+  };
 
-  room.onPlayerChat = function(player, message) {
-    if(message.startsWith("!")) {
+  room.onPlayerChat = function (player, message) {
+    if (message.startsWith("!")) {
       const args = message.split(/\s+/);
       const command = args[0].toLowerCase();
 
-      if(command == '!help') {
+      if (command == "!help") {
         sendHelpMessage(room, player);
-      }
-
-      else if(command == '!admin') {
-        if(args[1] != adminToken) {
+      } else if (command == "!admin") {
+        if (args[1] != adminToken) {
           room.sendAnnouncement("Wrong token!", player.id);
-        }
-        else {
+        } else {
           room.setPlayerAdmin(player.id, !player.admin);
         }
-      }
-
-      else if(command == '!bot') {
-        if(args[1] != adminToken) {
+      } else if (command == "!bot") {
+        if (args[1] != adminToken) {
           room.sendAnnouncement("Wrong token!", player.id);
-        }
-        else if(args[2]) {
+        } else if (args[2]) {
           var botId = parseInt(args[2]);
-          room.sendAnnouncement("You are now auth as the bot id "+botId, player.id);
-          window.messageToServer("onBotAuthentification", { botId: botId, roomId: player.id });
+          room.sendAnnouncement(
+            "You are now auth as the bot id " + botId,
+            player.id,
+          );
+          window.messageToServer("onBotAuthentification", {
+            botId: botId,
+            roomId: player.id,
+          });
           room.players[player.id].bot = true;
           room.players[player.id].botId = botId;
         }
-      }
-      else {
+      } else {
         room.sendAnnouncement("Unknown command!", player.id);
       }
       return false;
     }
     return !message.startsWith("!");
-  }
+  };
 
-  room.onPlayerActivity = function(player) {
+  room.onPlayerActivity = function (player) {
     room.players[player.id].lastActivityTime = Date.now();
-  }
+  };
 
-  room.onPlayerTeamChange = async function(changedPlayer, byPlayer) {
-    if(room.getScores()) {
+  room.onPlayerTeamChange = async function (changedPlayer, byPlayer) {
+    if (room.getScores()) {
       return;
     }
 
-    if(byPlayer) {
+    if (byPlayer) {
       return;
     }
 
     await wait(1000);
-    if(isGameReadyToPlay(room)) {
+    if (isGameReadyToPlay(room)) {
       room.startGame();
-    }
-    else {
+    } else {
       updateTeams(room);
     }
-  }
+  };
 
   function sendHelpMessage(room, player) {
-    room.sendAnnouncement("This room allows to play 1v1 games against the computer.", player.id, "0xFFFB00");
-    room.sendAnnouncement("AI bots are very bad at playing HaxBall for the moment but they will be better soon (hope so!).", player.id, "0xFFFB00");
-    room.sendAnnouncement(" - If you are developer, have a look at the GitHub project here : github.com/ludovjb/haxball_ai", player.id, "0xFFFB00");
-    room.sendAnnouncement(" - You will be able to make you own AI scripts soon.", player.id, "0xFFFB00");
-    room.sendAnnouncement(" - Please report issues and make suggestions on the GitHub page, thanks :)", player.id, "0xFFFB00");
+    room.sendAnnouncement(
+      "This room allows to play 1v1 games against the computer.",
+      player.id,
+      "0xFFFB00",
+    );
+    room.sendAnnouncement(
+      "AI bots are very bad at playing HaxBall for the moment but they will be better soon (hope so!).",
+      player.id,
+      "0xFFFB00",
+    );
+    room.sendAnnouncement(
+      " - If you are developer, have a look at the GitHub project here : github.com/ludovjb/haxball_ai",
+      player.id,
+      "0xFFFB00",
+    );
+    room.sendAnnouncement(
+      " - You will be able to make you own AI scripts soon.",
+      player.id,
+      "0xFFFB00",
+    );
+    room.sendAnnouncement(
+      " - Please report issues and make suggestions on the GitHub page, thanks :)",
+      player.id,
+      "0xFFFB00",
+    );
   }
 
   async function interruptGame(room, scores) {
     gameEnded = true;
     var cleanRedTeam = true;
 
-    if(kickOffDuration > 1200) {
-      room.sendAnnouncement("Kick-off too long... The match is interrupted.", null, "0xFF0000", "bold");
+    if (kickOffDuration > 1200) {
+      room.sendAnnouncement(
+        "Kick-off too long... The match is interrupted.",
+        null,
+        "0xFF0000",
+        "bold",
+      );
       kickOffDuration = 0;
-    }
-    else if(scores.red > scores.blue) {
+    } else if (scores.red > scores.blue) {
       room.sendAnnouncement("Red team won the match", null, "0xFFFB00", "bold");
-    }
-    else if(scores.blue > scores.red) {
-      room.sendAnnouncement("Blue team won the match", null, "0xFFFB00", "bold");
-    }
-    else if(scores.time > scores.scoreLimit) {
+    } else if (scores.blue > scores.red) {
+      room.sendAnnouncement(
+        "Blue team won the match",
+        null,
+        "0xFFFB00",
+        "bold",
+      );
+    } else if (scores.time > scores.scoreLimit) {
       room.sendAnnouncement("It's a draw !", null, "0xFFFB00", "bold");
-    }
-    else {
-      room.sendAnnouncement("A player has left... The match is interrupted.", null, "0xFF0000", "bold");
+    } else {
+      room.sendAnnouncement(
+        "A player has left... The match is interrupted.",
+        null,
+        "0xFF0000",
+        "bold",
+      );
       cleanRedTeam = false;
     }
 
@@ -216,15 +266,20 @@ export async function createHaxballRoom(serverName, password, recaptchaToken, ad
     updateTeams(room, cleanRedTeam);
   }
 
-  function getPlayersInTeam(room, team, list=null) {
-    if(list == null) {
+  function getPlayersInTeam(room, team, list = null) {
+    if (list == null) {
       list = room.getPlayerList();
     }
-    return list.filter(player => player.team == team);
+    return list.filter((player) => player.team == team);
   }
 
   function getPlayers(room, isBot) {
-    return room.getPlayerList().filter(player => room.players[player.id] && room.players[player.id].bot == isBot);
+    return room
+      .getPlayerList()
+      .filter(
+        (player) =>
+          room.players[player.id] && room.players[player.id].bot == isBot,
+      );
   }
 
   function isGameReadyToPlay(room) {
@@ -233,19 +288,26 @@ export async function createHaxballRoom(serverName, password, recaptchaToken, ad
     return !room.getScores() && redPlayersNumber == bluePlayersNumber;
   }
 
-  async function updateTeams(room, clearRedTeam=false) {
-    if(room.getScores()) {
+  async function updateTeams(room, clearRedTeam = false) {
+    if (room.getScores()) {
       return;
     }
 
     updateTeamsInProgress = true;
-    if(clearRedTeam) {
-      getPlayersInTeam(room, 1).forEach(player => room.setPlayerTeam(player.id, 0));
+    if (clearRedTeam) {
+      getPlayersInTeam(room, 1).forEach((player) =>
+        room.setPlayerTeam(player.id, 0),
+      );
     }
 
     var bots = getPlayers(room, true);
-    var availableBots = getPlayersInTeam(room, 0, bots).concat(getPlayersInTeam(room, 1, bots));
-    if(getPlayersInTeam(room, 2).length < numberOfPlayersPerTeam && availableBots.length > 0) {
+    var availableBots = getPlayersInTeam(room, 0, bots).concat(
+      getPlayersInTeam(room, 1, bots),
+    );
+    if (
+      getPlayersInTeam(room, 2).length < numberOfPlayersPerTeam &&
+      availableBots.length > 0
+    ) {
       var bot = availableBots.shift();
       room.setPlayerTeam(bot.id, 2);
       return;
@@ -253,7 +315,10 @@ export async function createHaxballRoom(serverName, password, recaptchaToken, ad
 
     var availablePlayers = getPlayersInTeam(room, 0);
     availablePlayers = availablePlayers.filter((player) => !player.admin);
-    if(await getPlayersInTeam(room, 1).length < numberOfPlayersPerTeam && availablePlayers.length > 0) {
+    if (
+      (await getPlayersInTeam(room, 1).length) < numberOfPlayersPerTeam &&
+      availablePlayers.length > 0
+    ) {
       var player = availablePlayers.shift();
       room.setPlayerTeam(player.id, 1);
       return;
@@ -263,30 +328,30 @@ export async function createHaxballRoom(serverName, password, recaptchaToken, ad
   }
 
   function wait(time) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => resolve(), time);
     });
   }
 
   function noActivityCheck(room) {
-    if(!room.getScores()) {
+    if (!room.getScores()) {
       return;
     }
 
     var dateNow = Date.now();
-    room.getPlayerList().forEach(player => {
-      if(player.admin || player.team == 0 || room.players[player.id].bot) {
+    room.getPlayerList().forEach((player) => {
+      if (player.admin || player.team == 0 || room.players[player.id].bot) {
         return;
       }
 
       var deltaTime = dateNow - room.players[player.id].lastActivityTime;
-      if(deltaTime > 15000) {
+      if (deltaTime > 15000) {
         room.kickPlayer(player.id, "You were AFK", false);
       }
     });
 
     var scores = room.getScores();
-    if(scores && kickOffDuration > 1200) {
+    if (scores && kickOffDuration > 1200) {
       interruptGame(room, scores);
       room.pauseGame(true);
     }

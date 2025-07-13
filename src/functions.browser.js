@@ -1,3 +1,3 @@
 export function getRoomLink(selectorRoomLink) {
-    return document.querySelector(selectorRoomLink).innerText
+  return document.querySelector(selectorRoomLink).innerText;
 }

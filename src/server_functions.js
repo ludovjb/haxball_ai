@@ -1,24 +1,28 @@
-import { fork } from 'child_process';
-import * as conf from './config.js';
+import { fork } from "child_process";
+import * as conf from "./config.js";
 
 export function checkPasswordValue(password) {
-  if(password.length > 30) {
-    console.error("Given password is too long (maxlength = 30). Default password ('"+conf.DEFAULT_PASSWORD+"') is set.");
+  if (password.length > 30) {
+    console.error(
+      "Given password is too long (maxlength = 30). Default password ('" +
+        conf.DEFAULT_PASSWORD +
+        "') is set.",
+    );
     return conf.DEFAULT_PASSWORD;
   }
   return password;
 }
 
-
 export async function checkAIActionFile(fileName) {
   const relativeFileName = "../" + fileName + ".js";
-
-
 
   try {
     await import(relativeFileName);
   } catch (error) {
-    console.error("An error has occurred with the following action file: " + relativeFileName);
+    console.error(
+      "An error has occurred with the following action file: " +
+        relativeFileName,
+    );
     console.error("ERROR " + error);
     process.exit(1);
   }
@@ -29,19 +33,25 @@ export async function checkAIActionFile(fileName) {
 var counterBots = 0;
 export function createBot(server) {
   var botId = ++counterBots;
-  const child = fork("./src/bot.js", [botId, server.roomLink, server.admin, server.password]);
+  const child = fork("./src/bot.js", [
+    botId,
+    server.roomLink,
+    server.admin,
+    server.password,
+  ]);
   server.bots[botId] = child;
-  if(server.verbose) {
+  if (server.verbose) {
     console.log("Bot id " + botId + " has been created and forked");
   }
   return botId;
 }
 
 export async function sendMessageToAllBots(bots, callbackName, data) {
-  Object.values(bots).forEach(async bot => bot.send({ callback: callbackName, data: data }));
+  Object.values(bots).forEach(async (bot) =>
+    bot.send({ callback: callbackName, data: data }),
+  );
 }
 
 export async function sendMessageToBot(bot, callbackName, data) {
   bot.send({ callback: callbackName, data: data });
 }
-

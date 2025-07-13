@@ -1,12 +1,11 @@
-import decache from 'decache';
-import * as conf from './config.js';
-import * as vec from './vectors.js';
-
+import decache from "decache";
+import * as conf from "./config.js";
+import * as vec from "./vectors.js";
 
 const keyHold = {};
 
 export function refreshActionFunction(bot) {
-  if(!bot.actionFile) {
+  if (!bot.actionFile) {
     return;
   }
   decache(bot.actionFile);
@@ -14,46 +13,70 @@ export function refreshActionFunction(bot) {
   try {
     const { action } = import(bot.actionFile);
     bot.actionFunction = action;
-  }
-  catch(error) {
+  } catch (error) {
     console.error(error);
     bot.actionFunction = null;
   }
 }
 
 export async function applyAction(team, actionName, page) {
-  if(team != conf.RED_TEAM && team != conf.BLUE_TEAM) {
+  if (team != conf.RED_TEAM && team != conf.BLUE_TEAM) {
     await resetAllKeysExceptFor(page);
     return;
   }
 
-  switch(actionName) {
-    case "kick": case "k":
+  switch (actionName) {
+    case "kick":
+    case "k":
       await pressKeys(page, getCommandKeys(team, "kick"));
       break;
-    case "forward": case "f":
+    case "forward":
+    case "f":
       await pressKeys(page, getCommandKeys(team, "forward"));
       break;
-    case "backward": case "b":
+    case "backward":
+    case "b":
       await pressKeys(page, getCommandKeys(team, "backward"));
       break;
-    case "left": case "l":
+    case "left":
+    case "l":
       await pressKeys(page, getCommandKeys(team, "left"));
       break;
-    case "right": case "r":
+    case "right":
+    case "r":
       await pressKeys(page, getCommandKeys(team, "right"));
       break;
-    case "forward-left": case "fl":
-      await pressKeys(page, getCommandKeys(team, "forward"), getCommandKeys(team, "left"));
+    case "forward-left":
+    case "fl":
+      await pressKeys(
+        page,
+        getCommandKeys(team, "forward"),
+        getCommandKeys(team, "left"),
+      );
       break;
-    case "forward-right": case "fr":
-      await pressKeys(page, getCommandKeys(team, "forward"), getCommandKeys(team, "right"));
+    case "forward-right":
+    case "fr":
+      await pressKeys(
+        page,
+        getCommandKeys(team, "forward"),
+        getCommandKeys(team, "right"),
+      );
       break;
-    case "backward-left": case "bl":
-      await pressKeys(page, getCommandKeys(team, "backward"), getCommandKeys(team, "left"));
+    case "backward-left":
+    case "bl":
+      await pressKeys(
+        page,
+        getCommandKeys(team, "backward"),
+        getCommandKeys(team, "left"),
+      );
       break;
-    case "backward-right": case "br":
-      await pressKeys(page, getCommandKeys(team, "backward"), getCommandKeys(team, "right"));
+    case "backward-right":
+    case "br":
+      await pressKeys(
+        page,
+        getCommandKeys(team, "backward"),
+        getCommandKeys(team, "right"),
+      );
       break;
     default: // none
       await resetAllKeysExceptFor(page);
@@ -64,11 +87,17 @@ export async function applyAction(team, actionName, page) {
 function getCommandKeys(team, commandName) {
   switch (commandName) {
     case "forward":
-      return team == conf.RED_TEAM ? "ArrowRight" : getOppositeCommand("ArrowRight");
+      return team == conf.RED_TEAM
+        ? "ArrowRight"
+        : getOppositeCommand("ArrowRight");
     case "backward":
-      return team == conf.RED_TEAM ? "ArrowLeft" : getOppositeCommand("ArrowLeft");
+      return team == conf.RED_TEAM
+        ? "ArrowLeft"
+        : getOppositeCommand("ArrowLeft");
     case "right":
-      return team == conf.RED_TEAM ? "ArrowDown" : getOppositeCommand("ArrowDown");
+      return team == conf.RED_TEAM
+        ? "ArrowDown"
+        : getOppositeCommand("ArrowDown");
     case "left":
       return team == conf.RED_TEAM ? "ArrowUp" : getOppositeCommand("ArrowUp");
     case "kick":
@@ -89,10 +118,10 @@ function getOppositeCommand(commandKey) {
   }
 }
 
- async function pressKeys(page, ...commandKeys) {
+async function pressKeys(page, ...commandKeys) {
   await resetAllKeysExceptFor(page, ...commandKeys);
   commandKeys.forEach(async (commandKey, _i) => {
-    if(!(commandKey in keyHold) || !keyHold[commandKey]) {
+    if (!(commandKey in keyHold) || !keyHold[commandKey]) {
       await page.keyboard.down(commandKey);
       keyHold[commandKey] = true;
     }
@@ -101,7 +130,7 @@ function getOppositeCommand(commandKey) {
 
 export async function resetAllKeysExceptFor(page, ...exceptions) {
   Object.keys(keyHold).forEach(async (commandKey, _i) => {
-    if(keyHold[commandKey] && !exceptions.includes(commandKey)) {
+    if (keyHold[commandKey] && !exceptions.includes(commandKey)) {
       await page.keyboard.up(commandKey);
       keyHold[commandKey] = false;
     }
@@ -109,11 +138,20 @@ export async function resetAllKeysExceptFor(page, ...exceptions) {
 }
 
 function computePlayerVelocity(playerId, lastData, currentData) {
-  if(lastData && lastData.players[playerId] && lastData.players[playerId].position &&
-    currentData && currentData.players[playerId] && currentData.players[playerId].position) {
+  if (
+    lastData &&
+    lastData.players[playerId] &&
+    lastData.players[playerId].position &&
+    currentData &&
+    currentData.players[playerId] &&
+    currentData.players[playerId].position
+  ) {
     var lastPlayerPosition = lastData.players[playerId].position;
     var curPlayerPosition = currentData.players[playerId].position;
-    return vec.div(vec.sub(curPlayerPosition, lastPlayerPosition), currentData.tick - lastData.tick);
+    return vec.div(
+      vec.sub(curPlayerPosition, lastPlayerPosition),
+      currentData.tick - lastData.tick,
+    );
   }
   return { x: 0, y: 0 };
 }
@@ -122,18 +160,26 @@ export function getBotRelativeGameEnv(dataHistory, bot) {
   var lastTickNumber = Math.max(...Object.keys(dataHistory));
   var currentData = dataHistory[lastTickNumber];
   var lastData = dataHistory[lastTickNumber - 1];
-  var localPlayer = Object.values(currentData.players).find((player) => player.id == bot.roomId);
-  if(!localPlayer || !localPlayer.position) {
+  var localPlayer = Object.values(currentData.players).find(
+    (player) => player.id == bot.roomId,
+  );
+  if (!localPlayer || !localPlayer.position) {
     return null;
   }
 
-  var botVelocity = computePlayerVelocity(localPlayer.id, lastData, currentData);
+  var botVelocity = computePlayerVelocity(
+    localPlayer.id,
+    lastData,
+    currentData,
+  );
 
   var ballVelocity;
-  if(lastData) {
-    ballVelocity = vec.div(vec.sub(currentData.ball, lastData.ball), currentData.tick - lastData.tick);
-  }
-  else {
+  if (lastData) {
+    ballVelocity = vec.div(
+      vec.sub(currentData.ball, lastData.ball),
+      currentData.tick - lastData.tick,
+    );
+  } else {
     ballVelocity = { x: 0, y: 0 };
   }
 
@@ -143,47 +189,60 @@ export function getBotRelativeGameEnv(dataHistory, bot) {
       id: localPlayer.id,
       team: localPlayer.team,
       position: localPlayer.position,
-      velocity: botVelocity
+      velocity: botVelocity,
     },
     score: {
-      ownTeam: localPlayer.team == conf.RED_TEAM ? currentData.scores.red : currentData.scores.blue,
-      opponentTeam: localPlayer.team == conf.RED_TEAM ? currentData.scores.blue : currentData.scores.red,
+      ownTeam:
+        localPlayer.team == conf.RED_TEAM
+          ? currentData.scores.red
+          : currentData.scores.blue,
+      opponentTeam:
+        localPlayer.team == conf.RED_TEAM
+          ? currentData.scores.blue
+          : currentData.scores.red,
       scoreLimit: currentData.scores.scoreLimit,
       time: currentData.scores.time,
-      timeLimit: currentData.scores.timeLimit
+      timeLimit: currentData.scores.timeLimit,
     },
     ball: {
       position: vec.sub(currentData.ball, localPlayer.position),
       velocity: ballVelocity,
     },
     teammates: [],
-    opponents: []
+    opponents: [],
   };
 
   Object.values(currentData.players).forEach((player) => {
-    if(player.id == localPlayer.id) {
+    if (player.id == localPlayer.id) {
       return;
     }
 
-    if(!player.position || player.team == conf.SPECTATORS) {
+    if (!player.position || player.team == conf.SPECTATORS) {
       return;
     }
 
-    var playerVelocity = computePlayerVelocity(player.id, lastData, currentData);
+    var playerVelocity = computePlayerVelocity(
+      player.id,
+      lastData,
+      currentData,
+    );
 
     var relativePlayerInfo = {
       id: player.id,
       position: vec.sub(player.position, localPlayer.position),
-      velocity: playerVelocity
+      velocity: playerVelocity,
     };
 
-    (player.team == localPlayer.team ? relativeEnv.teammates : relativeEnv.opponents).push(relativePlayerInfo);
+    (player.team == localPlayer.team
+      ? relativeEnv.teammates
+      : relativeEnv.opponents
+    ).push(relativePlayerInfo);
   });
 
-  if(localPlayer.team == conf.BLUE_TEAM) {
+  if (localPlayer.team == conf.BLUE_TEAM) {
     relativeEnv = vec.transformVectors(relativeEnv, (vector) => ({
       x: vector.x * -1,
-      y: vector.y * -1
+      y: vector.y * -1,
     }));
   }
   return relativeEnv;
