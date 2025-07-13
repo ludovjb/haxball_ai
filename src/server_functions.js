@@ -18,7 +18,7 @@ export async function checkAIActionFile(fileName) {
   try {
     await import(relativeFileName);
   } catch (error) {
-    console.error("An error  has occurred with the following action file: " + relativeFileName);
+    console.error("An error has occurred with the following action file: " + relativeFileName);
     console.error("ERROR " + error);
     process.exit(1);
   }
