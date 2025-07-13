@@ -6,7 +6,7 @@ var delayBeforePlay = conf.MAX_DELAY_BEFORE_PLAY;
 
 export async function onBotAuthentification(data, bot, _page) {
   bot.roomId = data.roomId;
-  console.log("The bot id "+bot.id+" is now authentificate as the bot roomId "+bot.roomId);
+  console.log("The bot id "+bot.id+" is now authenticated as the bot roomId "+bot.roomId);
 }
 
 export async function onGameTick(data, bot, page) {
