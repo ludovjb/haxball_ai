@@ -1,4 +1,30 @@
-FROM node:22-bullseye
+FROM node:22-alpine AS base
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+# ========================
+# CI stage
+# ========================
+FROM node:22-alpine AS dev
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+
+# ========================
+# Production stage
+# ========================
+FROM node:22-bullseye-slim AS prod
 
 RUN apt update
 RUN apt install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 \
@@ -12,8 +38,7 @@ RUN apt install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 \
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
 
-COPY . .
+RUN npm ci --omit=dev
 
-CMD ["node", "launcher.js", "thr1.AAAAAGhyXXF4LQftoCru3w.Pl_rigjiqPM"]
+CMD node launcher.js $HEADLESS_TOKEN

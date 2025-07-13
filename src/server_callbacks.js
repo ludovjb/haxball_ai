@@ -4,7 +4,7 @@ export async function onGameTick(data, server) {
     sendMessageToAllBots(server.bots, "onGameTick", data);
 };
 
-export async function onPlayerJoin(data, _server) {
+export async function onPlayerJoin(data, server) {
   console.log(data + " has joined the room");
 };
 
