@@ -71,7 +71,9 @@ export async function launchServer(args) {
   server.bots = {};
   for (let p = 0; p < server.numberOfBots; p++) {
     createBot(server);
-    await promises.setTimeout(60000);
+    if(p < server.numberOfBots - 1) {
+      await promises.setTimeout(60000);
+    }
   }
 
   var actionFileSettingOperation = () =>
