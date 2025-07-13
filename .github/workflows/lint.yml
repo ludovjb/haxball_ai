@@ -20,7 +20,9 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
+        working-directory: ./master
         run: npm ci
 
-      - name: Run ESLint
+      - name: Run ESLint          
+        working-directory: ./master
         run: npm run lint
