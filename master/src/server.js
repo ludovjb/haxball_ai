@@ -71,8 +71,8 @@ export async function launchServer(args) {
   server.bots = {};
   for (let p = 0; p < server.numberOfBots; p++) {
     createBot(server);
-    if(p < server.numberOfBots - 1) {
-      await promises.setTimeout(60000);
+    if (p < server.numberOfBots - 1) {
+      await promises.setTimeout(10000);
     }
   }
 

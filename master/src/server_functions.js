@@ -14,20 +14,17 @@ export function checkPasswordValue(password) {
 }
 
 export async function checkAIActionFile(fileName) {
-  const relativeFileName = "../" + fileName + ".js";
-
   try {
-    await import(relativeFileName);
+    await import(fileName);
   } catch (error) {
     console.error(
-      "An error has occurred with the following action file: " +
-        relativeFileName,
+      "An error has occurred with the following action file: " + fileName,
     );
     console.error("ERROR " + error);
     process.exit(1);
   }
 
-  return relativeFileName;
+  return fileName;
 }
 
 var counterBots = 0;
