@@ -18,9 +18,13 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
-      - name: Ruff check
+      - name: Ruff lint check
         working-directory: ./agent/brain/python
         run: uv run ruff check .
+
+      - name: Ruff format check
+        working-directory: ./agent/brain/python
+        run: uv run ruff format . --check
 
       - name: Mypy check
         working-directory: ./agent/brain/python
