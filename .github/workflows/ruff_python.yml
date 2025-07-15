@@ -1,5 +1,5 @@
 ---
-name: Lint python
+name: Ruff python
 
 on:
   push:
@@ -18,6 +18,10 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
-      - name: Set up Python
+      - name: Ruff check
+        working-directory: ./agent/brain/python
+        run: uv run ruff check .
+
+      - name: Mypy check
         working-directory: ./agent/brain/python
         run: uv run ruff check .

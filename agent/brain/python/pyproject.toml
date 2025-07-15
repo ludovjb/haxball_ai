@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "A stupid python haxball_ai brain"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "mypy>=1.17.0",
+]
 
 [dependency-groups]
 dev = [
