@@ -28,4 +28,4 @@ jobs:
 
       - name: Mypy check
         working-directory: ./agent/brain/python
-        run: uv run ruff check .
+        run: uv run mypy .

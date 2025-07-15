@@ -1,5 +1,5 @@
 ---
-name: Lint js
+name: ESLint js
 
 on:
   push:
