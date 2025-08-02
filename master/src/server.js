@@ -2,9 +2,10 @@ import puppeteer from "puppeteer";
 import { createHaxballRoom } from "./haxserver.browser.js";
 import * as roomCallbacks from "./server_callbacks.js";
 import * as browserFunctions from "./functions.browser.js";
-import { createBot, sendMessageToAllBots } from "./server_functions.js";
 import promises from "node:timers/promises";
 import open from "open";
+import { connect, JSONCodec } from 'nats';
+
 
 let browser = null;
 let server = {};
@@ -67,28 +68,21 @@ export async function launchServer(args) {
   console.log("The admin token is : " + server.admin);
   console.log("**************************************************");
 
-  server.numberOfBots = server.bots * 2;
-  server.bots = {};
-  for (let p = 0; p < server.numberOfBots; p++) {
-    createBot(server);
-    if (p < server.numberOfBots - 1) {
-      await promises.setTimeout(10000);
-    }
-  }
+  const nc = await connect({ servers: 'nats://nats:4222' });
 
-  var actionFileSettingOperation = () =>
-    sendMessageToAllBots(server.bots, "onActionFileRefresh", {
-      actionFile: server.redteam,
-    });
-  if (server.nocache) {
-    setInterval(actionFileSettingOperation, 1500);
-  } else {
-    setInterval(actionFileSettingOperation, 5000);
-  }
+  const jc = JSONCodec();
+
+  const message = { roomLink: server.roomLink, adminToken: server.admin, roomPassword: server.password };
+  
+
+  
 
   while (true) {
-    await promises.setTimeout(3000);
+    await promises.setTimeout(1000);
+    nc.publish('backend.ready', jc.encode(message));
   }
+  await nc.flush();
+  await nc.close();
 }
 
 async function onRoomMessage(callback, data) {

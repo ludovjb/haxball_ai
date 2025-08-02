@@ -1,10 +1,7 @@
 import { ArgumentParser } from "argparse";
 import * as conf from "./src/config.js";
 import { launchServer } from "./src/server.js";
-import {
-  checkPasswordValue,
-  checkAIActionFile,
-} from "./src/server_functions.js";
+import { checkPasswordValue } from "./src/server_functions.js";
 
 const parser = new ArgumentParser();
 
@@ -22,16 +19,6 @@ parser.add_argument("-b", "--bots", {
   help: "Number of bots",
   type: "int",
   default: 1,
-});
-parser.add_argument("--redteam", {
-  help: "AI action file",
-  type: checkAIActionFile,
-  default: conf.DEFAULT_AI_FILE,
-});
-parser.add_argument("--blueteam", {
-  help: "AI action file",
-  type: checkAIActionFile,
-  default: conf.DEFAULT_AI_FILE,
 });
 parser.add_argument("--admin", {
   help: "Admin token",

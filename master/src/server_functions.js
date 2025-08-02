@@ -13,20 +13,6 @@ export function checkPasswordValue(password) {
   return password;
 }
 
-export async function checkAIActionFile(fileName) {
-  try {
-    await import(fileName);
-  } catch (error) {
-    console.error(
-      "An error has occurred with the following action file: " + fileName,
-    );
-    console.error("ERROR " + error);
-    process.exit(1);
-  }
-
-  return fileName;
-}
-
 var counterBots = 0;
 export function createBot(server) {
   var botId = ++counterBots;

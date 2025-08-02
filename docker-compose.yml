@@ -1,12 +1,56 @@
 services:
-  app:
+  master:
     build:
       context: ./master
-      target: prod
+      dockerfile: Dockerfile
+    command: node launcher.js ${HEADLESS_TOKEN}
+    networks:
+      - mynet
+    depends_on:
+      - operator1
+      - operator2
+
+  brain:
+    build:
+      context: ./agent/brain/python
       dockerfile: Dockerfile
     volumes:
-      - ./master/:/app 
-      - /app/node_modules  # ignores node_modules local to avoid conflits
-    command: node launcher.js "${HEADLESS_TOKEN}"
-    environment:
-      HEADLESS_TOKEN: ${HEADLESS_TOKEN}
+      - ./agent/brain/python/:/app 
+    command: python main.py
+    networks:
+      - mynet
+
+  operator1:
+    build:
+      context: ./agent/operator
+      dockerfile: Dockerfile
+    command: node launcher.js
+    networks:
+      - mynet
+    depends_on:
+      - brain
+      - nats
+
+  operator2:
+    build:
+      context: ./agent/operator
+      dockerfile: Dockerfile
+    command: bash -c "sleep 20 && node launcher.js"
+    networks:
+      - mynet
+    depends_on:
+      - brain
+      - nats
+      - operator1
+
+
+  nats:
+    image: nats
+    ports:
+      - "4222:4222"
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge
