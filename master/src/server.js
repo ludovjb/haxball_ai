@@ -4,7 +4,7 @@ import * as roomCallbacks from "./server_callbacks.js";
 import * as browserFunctions from "./functions.browser.js";
 import promises from "node:timers/promises";
 import open from "open";
-import { connect, JSONCodec } from 'nats';
+import { publish} from './natsClient.js';
 
 
 let browser = null;
@@ -68,18 +68,12 @@ export async function launchServer(args) {
   console.log("The admin token is : " + server.admin);
   console.log("**************************************************");
 
-  const nc = await connect({ servers: 'nats://nats:4222' });
-
-  const jc = JSONCodec();
-
   const message = { roomLink: server.roomLink, adminToken: server.admin, roomPassword: server.password };
-  
-
   
 
   while (true) {
     await promises.setTimeout(1000);
-    nc.publish('backend.ready', jc.encode(message));
+    publish('backend.ready', message);
   }
   await nc.flush();
   await nc.close();

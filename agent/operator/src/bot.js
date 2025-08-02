@@ -2,6 +2,7 @@ import puppeteer from "puppeteer";
 import * as botCallbacks from "./bot_callbacks.js";
 import * as promises from "node:timers/promises";
 import * as os from 'os';
+import { subscribe } from "./natsClient.js";
 
 const hostname = os.hostname();
 
@@ -57,7 +58,7 @@ export async function launchAgent(roomLink, adminToken, roomPassword) {
   await sendChat(page, "/avatar ai");
   await sendChat(page, "!bot " + bot.adminToken + " " + bot.name);
 
-  process.on("message", (message) => onServerMessage(message, page));
+  subscribe("backend.message", async (message) => onServerMessage(message, page))
 
   console.log(`Bot ${bot.name}: authenticated`);
 

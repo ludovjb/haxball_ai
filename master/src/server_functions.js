@@ -1,5 +1,5 @@
-import { fork } from "child_process";
 import * as conf from "./config.js";
+import { publish } from "./natsClient.js";
 
 export function checkPasswordValue(password) {
   if (password.length > 30) {
@@ -13,28 +13,7 @@ export function checkPasswordValue(password) {
   return password;
 }
 
-var counterBots = 0;
-export function createBot(server) {
-  var botId = ++counterBots;
-  const child = fork("./src/bot.js", [
-    botId,
-    server.roomLink,
-    server.admin,
-    server.password,
-  ]);
-  server.bots[botId] = child;
-  if (server.verbose) {
-    console.log("Bot id " + botId + " has been created and forked");
-  }
-  return botId;
-}
 
 export async function sendMessageToAllBots(bots, callbackName, data) {
-  Object.values(bots).forEach(async (bot) =>
-    bot.send({ callback: callbackName, data: data }),
-  );
-}
-
-export async function sendMessageToBot(bot, callbackName, data) {
-  bot.send({ callback: callbackName, data: data });
+  publish("backend.message", { callback: callbackName, data: data })
 }
