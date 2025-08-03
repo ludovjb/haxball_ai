@@ -3,7 +3,7 @@ services:
     build:
       context: ./master
       dockerfile: Dockerfile
-    command: node launcher.js ${HEADLESS_TOKEN}
+    command: node launcher.js ${HEADLESS_TOKEN} --bots ${NUMBER_OF_BOTS_PER_TEAM}
     networks:
       - mynet
     depends_on:
