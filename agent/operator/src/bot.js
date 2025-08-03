@@ -11,6 +11,7 @@ let bot = null;
 let browser = null;
 
 export async function launchAgent(roomLink, adminToken, roomPassword) {
+  await promises.setTimeout(5000);
   bot = {
     name: "bot-" + hostname,
     adminToken: adminToken,
@@ -44,7 +45,6 @@ export async function launchAgent(roomLink, adminToken, roomPassword) {
     console.log(`Bot ${bot.name}: password entered`);
   }
 
-  await promises.setTimeout(10000);
 
   try {
     await myframe.waitForSelector(".icon-menu");
