@@ -3,7 +3,6 @@ import * as vec from "./vectors.js";
 
 const keyHold = {};
 
-
 export async function applyAction(team, actionName, page) {
   if (team != conf.RED_TEAM && team != conf.BLUE_TEAM) {
     await resetAllKeysExceptFor(page);

@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import * as botCallbacks from "./bot_callbacks.js";
 import * as promises from "node:timers/promises";
-import * as os from 'os';
+import * as os from "os";
 import { subscribe } from "./natsClient.js";
 
 const hostname = os.hostname();
@@ -15,7 +15,7 @@ export async function launchAgent(roomLink, adminToken, roomPassword) {
   bot = {
     name: "bot-" + hostname,
     adminToken: adminToken,
-  }
+  };
   console.log(`Bot ${bot.name} is coming...`);
 
   browser = await puppeteer.launch({ args: ["--no-sandbox"] });
@@ -45,7 +45,6 @@ export async function launchAgent(roomLink, adminToken, roomPassword) {
     console.log(`Bot ${bot.name}: password entered`);
   }
 
-
   try {
     await myframe.waitForSelector(".icon-menu");
   } catch (error) {
@@ -58,7 +57,9 @@ export async function launchAgent(roomLink, adminToken, roomPassword) {
   await sendChat(page, "/avatar ai");
   await sendChat(page, "!bot " + bot.adminToken + " " + bot.name);
 
-  subscribe("backend.message", async (message) => onServerMessage(message, page))
+  subscribe("backend.message", async (message) =>
+    onServerMessage(message, page),
+  );
 
   console.log(`Bot ${bot.name}: authenticated`);
 

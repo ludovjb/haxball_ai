@@ -13,7 +13,6 @@ export function checkPasswordValue(password) {
   return password;
 }
 
-
 export async function sendMessageToAllBots(bots, callbackName, data) {
-  publish("backend.message", { callback: callbackName, data: data })
+  publish("backend.message", { callback: callbackName, data: data });
 }

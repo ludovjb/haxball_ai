@@ -2,10 +2,8 @@ import puppeteer from "puppeteer";
 import { createHaxballRoom } from "./haxserver.browser.js";
 import * as roomCallbacks from "./server_callbacks.js";
 import * as browserFunctions from "./functions.browser.js";
-import promises from "node:timers/promises";
 import open from "open";
-import { publish} from './natsClient.js';
-
+import { publish } from "./natsClient.js";
 
 let browser = null;
 let server = {};
@@ -38,7 +36,6 @@ export async function launchServer(args) {
     server.password,
     server.token,
     server.admin,
-    server.bots,
   );
 
   const selectorRoomLink = "#roomlink p a";
@@ -68,9 +65,13 @@ export async function launchServer(args) {
   console.log("The admin token is : " + server.admin);
   console.log("**************************************************");
 
-  const message = { roomLink: server.roomLink, adminToken: server.admin, roomPassword: server.password };
-  publish('backend.ready', message);
-  process.stdin.resume()
+  const message = {
+    roomLink: server.roomLink,
+    adminToken: server.admin,
+    roomPassword: server.password,
+  };
+  publish("backend.ready", message);
+  process.stdin.resume();
 }
 
 async function onRoomMessage(callback, data) {
@@ -88,9 +89,6 @@ async function onRoomMessage(callback, data) {
 
 function cleanExit() {
   browser.close();
-  Object.values(server.bots).forEach((bot) => {
-    bot.kill("SIGINT");
-  });
   console.log("Server exited.");
   process.exit();
 }

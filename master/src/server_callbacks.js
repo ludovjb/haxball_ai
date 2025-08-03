@@ -1,6 +1,4 @@
-import {
-  sendMessageToAllBots
-} from "./server_functions.js";
+import { sendMessageToAllBots } from "./server_functions.js";
 import { publish } from "./natsClient.js";
 export async function onGameTick(data, server) {
   sendMessageToAllBots(server.bots, "onGameTick", data);
@@ -35,6 +33,10 @@ export async function onGameStart(data, server) {
 
 export async function onBotAuthentification(data, server) {
   sendMessageToAllBots(server.bots, "onBotAuthentification", data);
-  const message = { roomLink: server.roomLink, adminToken: server.admin, roomPassword: server.password };
-  publish('backend.ready', message);
+  const message = {
+    roomLink: server.roomLink,
+    adminToken: server.admin,
+    roomPassword: server.password,
+  };
+  publish("backend.ready", message);
 }

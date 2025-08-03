@@ -4,12 +4,12 @@ import {
   resetAllKeysExceptFor,
   getBotRelativeGameEnv,
 } from "./bot_functions.js";
-import {action} from '../agents/simple_ai.js'
+import { action } from "../agents/simple_ai.js";
 var dataHistory = {};
 var delayBeforePlay = conf.MAX_DELAY_BEFORE_PLAY;
 
 export async function onBotAuthentification(data, bot, _page) {
-  if(data.botName == bot.name) {
+  if (data.botName == bot.name) {
     bot.roomId = data.roomId;
     console.log(
       "The bot id " +
@@ -27,7 +27,6 @@ export async function onGameTick(data, bot, page) {
     return;
   }
 
-  
   dataHistory[data.tick] = data;
   if (!(data.tick - 1 in dataHistory) || !(data.tick - 2 in dataHistory)) {
     return;

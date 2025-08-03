@@ -1,17 +1,22 @@
-import { connect, JSONCodec } from 'nats';
+import { connect, JSONCodec } from "nats";
 
 let nc = null;
 const jc = JSONCodec();
 
 async function getNatsClient() {
   if (!nc) {
-    nc = await connect({ servers: 'nats://nats:4222' });
-    console.log('Connected to NATS');
+    nc = await connect({ servers: "nats://nats:4222" });
+    console.log("Connected to NATS");
   }
   return nc;
 }
 
-export async function subscribe(subject, handler, maxMessages = null, queue=null) {
+export async function subscribe(
+  subject,
+  handler,
+  maxMessages = null,
+  queue = null,
+) {
   const nc = await getNatsClient();
   let count = 0;
 
@@ -25,7 +30,7 @@ export async function subscribe(subject, handler, maxMessages = null, queue=null
 
       try {
         const data = jc.decode(msg.data);
-        handler(data).catch(e => {
+        handler(data).catch((e) => {
           console.error(`Error in handler for [${subject}]:`, e);
         });
 
@@ -40,7 +45,9 @@ export async function subscribe(subject, handler, maxMessages = null, queue=null
     },
   });
 
-  console.log(`Subscribed to [${subject}]${maxMessages ? ` (max ${maxMessages} messages)` : ''}`);
+  console.log(
+    `Subscribed to [${subject}]${maxMessages ? ` (max ${maxMessages} messages)` : ""}`,
+  );
   return sub;
 }
 
