@@ -7,8 +7,7 @@ services:
     networks:
       - mynet
     depends_on:
-      - operator1
-      - operator2
+      - operator
 
   brain:
     build:
@@ -20,7 +19,7 @@ services:
     networks:
       - mynet
 
-  operator1:
+  operator:
     build:
       context: ./agent/operator
       dockerfile: Dockerfile
@@ -30,18 +29,6 @@ services:
     depends_on:
       - brain
       - nats
-
-  operator2:
-    build:
-      context: ./agent/operator
-      dockerfile: Dockerfile
-    command: bash -c "sleep 20 && node launcher.js"
-    networks:
-      - mynet
-    depends_on:
-      - brain
-      - nats
-      - operator1
 
 
   nats:

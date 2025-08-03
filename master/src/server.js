@@ -69,14 +69,8 @@ export async function launchServer(args) {
   console.log("**************************************************");
 
   const message = { roomLink: server.roomLink, adminToken: server.admin, roomPassword: server.password };
-  
-
-  while (true) {
-    await promises.setTimeout(1000);
-    publish('backend.ready', message);
-  }
-  await nc.flush();
-  await nc.close();
+  publish('backend.ready', message);
+  process.stdin.resume()
 }
 
 async function onRoomMessage(callback, data) {

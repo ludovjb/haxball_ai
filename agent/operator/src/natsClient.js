@@ -11,11 +11,12 @@ async function getNatsClient() {
   return nc;
 }
 
-export async function subscribe(subject, handler, maxMessages = null) {
+export async function subscribe(subject, handler, maxMessages = null, queue=null) {
   const nc = await getNatsClient();
   let count = 0;
 
   const sub = nc.subscribe(subject, {
+    queue: queue,
     callback: (err, msg) => {
       if (err) {
         console.error(`NATS error on [${subject}]:`, err);
