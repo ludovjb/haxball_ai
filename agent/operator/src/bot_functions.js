@@ -1,23 +1,7 @@
-import decache from "decache";
 import * as conf from "./config.js";
 import * as vec from "./vectors.js";
 
 const keyHold = {};
-
-export function refreshActionFunction(bot) {
-  if (!bot.actionFile) {
-    return;
-  }
-  decache(bot.actionFile);
-
-  try {
-    const { action } = import(bot.actionFile);
-    bot.actionFunction = action;
-  } catch (error) {
-    console.error(error);
-    bot.actionFunction = null;
-  }
-}
 
 export async function applyAction(team, actionName, page) {
   if (team != conf.RED_TEAM && team != conf.BLUE_TEAM) {

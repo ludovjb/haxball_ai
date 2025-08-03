@@ -25,8 +25,16 @@ optional arguments:
   --vps                 If the server will be running on a VPS
   ```
 
-- Launch the server with a token from [here](https://www.haxball.com/headlesstoken) :
-`node launcher.js {token}`
+  ## Install
+
+- Install [direnv](https://direnv.net/docs/installation.html)
+
+- Create a config file (enter the token you get from [here](https://www.haxball.com/headlesstoken))
+`echo 'export HEADLESS_TOKEN="<your headless token here>"' > .envrc`
+`echo 'export NUMBER_OF_BOTS_PER_TEAM=1' >> .envrc`
+
+- Launch the server and its bots - this command will (re)build all docker images first :
+`./start.sh`
 
 ## AI agents
 

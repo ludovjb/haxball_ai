@@ -13,7 +13,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev --verbose
 
 COPY . .
 

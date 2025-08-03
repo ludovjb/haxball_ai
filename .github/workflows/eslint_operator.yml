@@ -1,4 +1,5 @@
-name: Lint Code Base
+---
+name: ESLint Operator
 
 on:
   push:
@@ -20,9 +21,9 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        working-directory: ./master
+        working-directory: ./agent/operator
         run: npm ci
 
-      - name: Run ESLint          
-        working-directory: ./master
+      - name: Run ESLint
+        working-directory: ./agent/operator
         run: npm run lint

@@ -1,33 +1,22 @@
 import puppeteer from "puppeteer";
 import * as botCallbacks from "./bot_callbacks.js";
 import * as promises from "node:timers/promises";
+import * as os from "os";
+import { subscribe } from "./natsClient.js";
 
-const botId = parseInt(process.argv[2]);
-if (!botId) {
-  throw "Please provide a bot name as a first argument";
-}
+const hostname = os.hostname();
 
-const roomLink = process.argv[3];
-if (!roomLink) {
-  throw "Please provide URL as a second argument";
-}
+let bot = null;
 
-const adminToken = process.argv[4];
-if (!adminToken) {
-  throw "Please provide an admin token as a third argument";
-}
-
-const bot = {
-  id: botId,
-  name: "bot-" + botId,
-  adminToken: adminToken,
-};
-
-const roomPassword = process.argv[5];
 let browser = null;
 
-async function run() {
-  console.log(`Bot ${botId} is coming...`);
+export async function launchAgent(roomLink, adminToken, roomPassword) {
+  await promises.setTimeout(5000);
+  bot = {
+    name: "bot-" + hostname,
+    adminToken: adminToken,
+  };
+  console.log(`Bot ${bot.name} is coming...`);
 
   browser = await puppeteer.launch({ args: ["--no-sandbox"] });
   const page = await browser.newPage();
@@ -42,21 +31,19 @@ async function run() {
   const inputName = await myframe.$("input[data-hook=input]");
   await inputName.type(bot.name);
 
-  // await page.screenshot({ path: `example-bot-${botId}.png`, fullPage: true });
+  // await page.screenshot({ path: `example-bot-${bot.name}.png`, fullPage: true });
   // console.log("screenschot")
   const buttonName = await myframe.$("button");
   await buttonName.click();
-  console.log(`Bot ${botId}: name entered`);
+  console.log(`Bot ${bot.name}: name entered`);
 
   if (roomPassword) {
     const inputPassword = await myframe.$("input[data-hook=input]");
     await inputPassword.type(roomPassword);
     const buttonPassword = await myframe.$("button[data-hook=ok]");
     await buttonPassword.click();
-    console.log(`Bot ${botId}: password entered`);
+    console.log(`Bot ${bot.name}: password entered`);
   }
-
-  await promises.setTimeout(10000);
 
   try {
     await myframe.waitForSelector(".icon-menu");
@@ -65,14 +52,16 @@ async function run() {
     await page.screenshot({ path: bot.name + ".png" });
   }
   await myframe.waitForSelector(".icon-menu", { timeout: 999999999 });
-  console.log(`Bot ${botId}: room entered`);
+  console.log(`Bot ${bot.name}: room entered`);
 
   await sendChat(page, "/avatar ai");
-  await sendChat(page, "!bot " + bot.adminToken + " " + bot.id);
+  await sendChat(page, "!bot " + bot.adminToken + " " + bot.name);
 
-  process.on("message", (message) => onServerMessage(message, page));
+  subscribe("backend.message", async (message) =>
+    onServerMessage(message, page),
+  );
 
-  console.log(`Bot ${botId}: authenticated`);
+  console.log(`Bot ${bot.name}: authenticated`);
 
   while (await myframe.$(".icon-menu")) {
     await promises.setTimeout(4000);
@@ -107,5 +96,3 @@ function cleanExit() {
 }
 process.on("SIGINT", cleanExit); // catch ctrl-c
 process.on("SIGTERM", cleanExit); // catch kill
-
-run();

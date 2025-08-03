@@ -1,9 +1,5 @@
-import {
-  createBot,
-  sendMessageToBot,
-  sendMessageToAllBots,
-} from "./server_functions.js";
-
+import { sendMessageToAllBots } from "./server_functions.js";
+import { publish } from "./natsClient.js";
 export async function onGameTick(data, server) {
   sendMessageToAllBots(server.bots, "onGameTick", data);
 }
@@ -13,14 +9,13 @@ export async function onPlayerJoin(data, _server) {
 }
 
 export async function onPlayerLeave(data, server) {
-  if (data.botId) {
-    if (data.botId in server.bots) {
-      delete server.bots[data.botId];
-      console.log("The bot id " + data.botId + " has left the room");
-      createBot(server);
+  if (data.botName) {
+    if (data.botName in server.bots) {
+      delete server.bots[data.botName];
+      console.log("The bot id " + data.botName + " has left the room");
     } else {
       console.error(
-        "The bot id " + data.botId + " doesn't exist in the server",
+        "The bot id " + data.botName + " doesn't exist in the server",
       );
     }
   } else {
@@ -37,9 +32,11 @@ export async function onGameStart(data, server) {
 }
 
 export async function onBotAuthentification(data, server) {
-  if (!server.bots[data.botId]) {
-    console.error("The bot id " + data.botId + " doesn't exist in the server");
-    return;
-  }
-  sendMessageToBot(server.bots[data.botId], "onBotAuthentification", data);
+  sendMessageToAllBots(server.bots, "onBotAuthentification", data);
+  const message = {
+    roomLink: server.roomLink,
+    adminToken: server.admin,
+    roomPassword: server.password,
+  };
+  publish("backend.ready", message);
 }

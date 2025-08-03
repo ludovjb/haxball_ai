@@ -1,22 +1,23 @@
 import * as conf from "./config.js";
 import {
-  refreshActionFunction,
   applyAction,
   resetAllKeysExceptFor,
   getBotRelativeGameEnv,
 } from "./bot_functions.js";
-
+import { action } from "../agents/simple_ai.js";
 var dataHistory = {};
 var delayBeforePlay = conf.MAX_DELAY_BEFORE_PLAY;
 
 export async function onBotAuthentification(data, bot, _page) {
-  bot.roomId = data.roomId;
-  console.log(
-    "The bot id " +
-      bot.id +
-      " is now authenticated as the bot roomId " +
-      bot.roomId,
-  );
+  if (data.botName == bot.name) {
+    bot.roomId = data.roomId;
+    console.log(
+      "The bot id " +
+        bot.name +
+        " is now authenticated as the bot roomId " +
+        bot.roomId,
+    );
+  }
 }
 
 export async function onGameTick(data, bot, page) {
@@ -64,14 +65,7 @@ export async function onGameTick(data, bot, page) {
     delayBeforePlay = conf.MAX_DELAY_BEFORE_PLAY;
   }
 
-  var actionName;
-  try {
-    actionName = bot.actionFunction ? bot.actionFunction(environment) : "none";
-  } catch (error) {
-    console.error(error);
-    actionName = "none";
-  }
-  applyAction(environment.bot.team, actionName, page);
+  applyAction(environment.bot.team, action(environment), page);
 }
 
 export async function onPositionsReset(_data, _bot, _page) {
@@ -80,11 +74,4 @@ export async function onPositionsReset(_data, _bot, _page) {
 
 export async function onGameStart(_data, _bot, _page) {
   delayBeforePlay = conf.DELAY_BEFORE_PLAY;
-}
-
-export async function onActionFileRefresh(data, bot, _page) {
-  if (data.actionFile) {
-    bot.actionFile = data.actionFile;
-  }
-  refreshActionFunction(bot);
 }

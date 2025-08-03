@@ -52,10 +52,10 @@ export async function createHaxballRoom(
 
   room.onPlayerLeave = function (player) {
     if (room.players[player.id].bot) {
-      var botId = room.players[player.id].botId;
+      var botName = room.players[player.id].botName;
       delete room.players[player.id];
       window.messageToServer("onPlayerLeave", {
-        botId: botId,
+        botName: botName,
         roomId: player.id,
       });
     } else {
@@ -75,7 +75,6 @@ export async function createHaxballRoom(
     }
 
     tickNumber++;
-
     var data = {};
     data.ball = room.getBallPosition();
     data.players = {};
@@ -157,17 +156,17 @@ export async function createHaxballRoom(
         if (args[1] != adminToken) {
           room.sendAnnouncement("Wrong token!", player.id);
         } else if (args[2]) {
-          var botId = parseInt(args[2]);
+          var botName = args[2];
           room.sendAnnouncement(
-            "You are now auth as the bot id " + botId,
+            "You are now auth as the bot id " + botName,
             player.id,
           );
           window.messageToServer("onBotAuthentification", {
-            botId: botId,
+            botName: botName,
             roomId: player.id,
           });
           room.players[player.id].bot = true;
-          room.players[player.id].botId = botId;
+          room.players[player.id].botName = botName;
         }
       } else {
         room.sendAnnouncement("Unknown command!", player.id);
