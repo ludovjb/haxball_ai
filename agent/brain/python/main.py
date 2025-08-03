@@ -1,13 +1,14 @@
 import asyncio
 from nats.aio.client import Client as NATS
+from typing import Any
 
 
-async def main():
+async def main() -> None:
     nc = NATS()
     await nc.connect("nats://nats:4222")
     print("nats connected!!")
 
-    async def message_handler(msg):
+    async def message_handler(msg: Any) -> None:
         print(f"Received signal: {msg.data.decode()}")
         print("Starting frontend app...")
         await nc.close()
